@@ -1,0 +1,259 @@
+<head>
+    <!-- SweetAlert2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    <!-- SweetAlert2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+
+
+<div class="screen-overlay"></div>
+ 
+
+<main class="main-wrap">
+
+  <section class="content-main">
+    <div class="content-header">
+      <div>
+        <h2 class="content-title card-title">Category List</h2>
+
+      </div>
+      <div>
+
+        <a  class="btn btn-primary btn-sm rounded" href="/admin/addCategory">Create New Category</a>
+      </div>
+    </div>
+    <div class="card mb-4">
+      
+      
+      <div class="card-body">
+
+        {{!-- {{#each category}}
+        <article class="itemlist">
+          <div class="row align-items-center">
+            <div class="col col-check flex-grow-0">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" />
+              </div>
+            </div>
+            <div class="col-lg-4 col-sm-4 col-8 flex-grow-1 col-name">
+              <a class="itemside" href="#">
+                <div class="left">
+                  <img
+                    src="/assets/imgs/products/{{imageUrl}}"
+                    class="img-sm img-thumbnail"
+                    alt="Item"
+                  />
+                </div>
+                
+              </a>
+            </div>
+            <div class="col-lg-3 col-sm-3 col-3 col-price">
+              <span>{{this.category}} </span>
+            </div>
+            {{#if isListed}}
+            <div class="col-lg-2 col-sm-2 col-4 col-status">
+              <span class="badge rounded-pill alert-success">Listed</span>
+            </div>
+            {{else}}
+            <div class="col-lg-2 col-sm-2 col-4 col-status">
+              <span class="badge rounded-pill alert-success">UnListed</span>
+            </div>
+            {{/if}}
+
+            <div class="col-lg-2 col-sm-2 col-4 col-action text-end">
+              <a href="#" class="btn btn-sm font-sm rounded btn-brand">
+                <i class="material-icons md-edit"></i>
+                Edit
+              </a>
+              <a href="#" class="btn btn-sm font-sm btn-light rounded">
+                <i class="material-icons md-delete_forever"></i>
+                unlist
+              </a>
+              <a href="#" class="btn btn-sm font-sm btn-light rounded">
+                <i class="material-icons md-delete_forever"></i>
+                unlist
+              </a>
+              <a href="/admin/deleteCategory"
+                           id="deletecat" data-product-id="{{this._id}}"
+                            class="btn btn font-sm btn-light rounded">
+                            <i class="material-icons md-delete_forever"></i> Delete
+                        </a>
+            </div>
+          </div>
+          <!-- row .// -->
+        </article>
+        {{/each}} --}}
+
+        <!---category tab-->
+            {{#each category}}
+            <article class="itemlist">
+                <div class="row align-items-center">
+                    <div class="col col-check flex-grow-0">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="">
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-sm-3 col-3 flex-grow-1 col-name jsutify-content-center text-align-center">
+                        <a class="itemside" href="#">
+                            <div class="d-flex aligin-items-center justify-content-center">
+                                <img src="/assets/imgs/products/{{imageUrl}}" class="img-sm img-thumbnail" alt="Item">
+                            </div>
+
+                        </a>
+                    </div>
+                    <div class="col-lg-3 col-sm-3 col-3 flex-grow-1 col-name text-align-center">
+                        <a class="itemside" href="#">
+
+                            <div class="info">
+                                <h6 class="mb-0">{{this.category}}</h6>
+                            </div>
+                        </a>
+                    </div>
+                    {{!-- <div class="col-lg-2 col-sm-2 col-4 col-price"> <span>$76.99</span> </div> --}}
+
+                    <div class="col-lg-3 col-sm-3 col-3 col-status">
+                        {{#if isListed}}
+                        <span class="badge rounded-pill alert-success">Listed</span>
+                        {{else}}
+                        <span class="badge rounded-pill alert-danger">Unlisted</span>
+                        {{/if}}
+                    </div>
+                    <div class="col-lg-1 col-sm-1 col-1 col-date text-end">
+                        <a href="/admin/editCategory/{{this._id}}"
+                           
+                            class="btn btn-pill font-sm rounded btn-brand">
+                            <i class="material-icons md-edit"></i> Edit
+                        </a>
+                    </div>
+                    {{#if isListed}}
+                    <div class="col-lg-1 col-sm-1 col-1 col-date text-end">
+                        <a href="/admin/unlistCategory"
+                           id="listunlistrod" data-product-id="{{this._id}}"
+                            class="btn btn font-sm btn-light rounded">
+                            <i class="material-icons md-delete_forever"></i> Unlist
+                        </a>
+                    </div>
+                    {{else}}
+                    <div class="col-lg-1 col-sm-1 col-1 col-date text-end">
+                       
+                        <a href="/admin/unlistCategory"
+                           id="listunlistrod" data-product-id="{{this._id}}"
+                            class="btn btn font-sm btn-light rounded">
+                            <i class="material-icons md-delete_forever"></i> List
+                        </a>
+                    </div>
+                    {{/if}}
+                    
+                </div> 
+            </article>
+            {{/each}}
+            <!---end category tab-->
+        
+
+      </div>
+      <!-- card-body end// -->
+    </div>
+    <!-- card end// -->
+    <div class="pagination-area mt-30 mb-50">
+      <nav aria-label="Page navigation example">
+        <ul class="pagination justify-content-start">
+          <li class="page-item active"><a class="page-link" href="#">01</a></li>
+          <li class="page-item"><a class="page-link" href="#">02</a></li>
+          <li class="page-item"><a class="page-link" href="#">03</a></li>
+          {{!-- <li class="page-item"><a class="page-link dot" href="#">...</a></li>
+          <li class="page-item"><a class="page-link" href="#">16</a></li>
+          <li class="page-item"><a class="page-link" href="#"><i
+                class="material-icons md-chevron_right"
+              ></i></a></li> --}}
+        </ul>
+      </nav>
+    </div>
+  </section>
+  <!-- content-main end// -->
+  <footer class="main-footer font-xs">
+    <div class="row pb-30 pt-15">
+      <div class="col-sm-6">
+        <script>
+          document.write(new Date().getFullYear())
+        </script>
+        ©, MobileBazaar .
+      </div>
+      <div class="col-sm-6">
+        <div class="text-sm-end">
+          All rights reserved
+        </div>
+      </div>
+    </div>
+  </footer>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+
+
+<script>
+   
+
+
+    /////block category
+
+    $(document).ready(function () {
+        $(document).on('click', '#listunlistrod', function (e) {
+            e.preventDefault();
+            var id = $(this).data('product-id');
+            //var wishId = $(this).data('whishlist-id'); // Corrected variable name to wishId
+
+            // Store reference to $(this) in a variable for use inside AJAX success and error callbacks
+            var $this = $(this);
+
+            Swal.fire({
+                title: "Are you sure?",
+                // text: "Do you want to block the Product?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#088178",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes!"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        type: 'POST',
+                        url: '/admin/unlistCategory',
+                        contentType: 'application/json',
+                        data: JSON.stringify({ id: id }),
+                        success: function (productData) {
+                            console.log("ProductBlocked");
+
+
+                            {
+                                Swal.fire({
+                                    title: 'Done!',
+                                    //text: 'Product Succesfully Blocked!!!',
+                                    icon: 'success',
+                                    confirmButtonText: 'Cool'
+                                }).then(() => window.location.reload())
+                            }
+
+
+                        },
+                        error: function (xhr, status, error) {
+                            console.error("Error removing product from wishlist:", error);
+                            swal("Error", "Something went wrong. Please try again later.", "error");
+                        }
+                    });
+                    Swal.fire({
+                        title: "Done!",
+                        text: "Your file has been deleted.",
+                        icon: "success"
+                    });
+                }
+            });
+
+
+        });
+    });
+
+
+</script>
