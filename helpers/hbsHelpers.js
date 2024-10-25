@@ -27,6 +27,14 @@ function addHelper(Handlebars) {
   });
 }
 
+
+function isequal(Handlebars) {
+  Handlebars.registerHelper('ifEquals', function (arg1, arg2, options) {
+      //console.log(arg1,arg2,options)
+      return (arg1 == arg2) ? options.fn(this) : options.inverse(this);
+  });
+}
+
 function isCancelled(Handlebars) {
   Handlebars.registerHelper('statuchecker',  function (value) {
       let ct=0
@@ -83,5 +91,6 @@ module.exports = {
   mulHelper,
   addHelper,
   isCancelled,
-  formatDate
+  formatDate,
+  isequal
 }

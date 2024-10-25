@@ -183,12 +183,22 @@ const updateCart = async (req, res) => {
         let cartquant=await Product.findOne({_id:oldCart.product_Id},{stock:1,_id:0}).lean()
         console.log(cartquant.stock,"cartquant--------------------------------------------------------------")
         
-        if(cartquant.stock-1<=req.body.newValue){
-            return res.json({
-                success: false,
-                message: 'Product stock limit reached!'
-            })
-        }
+        // Check if the user is trying to exceed the maximum quantity allowed (4)
+if (req.body.newValue > 4) { 
+    return res.json({
+        success: false,
+        message: 'You can only choose up to 4 units of this product.'
+    });
+}
+
+// Check if the requested quantity exceeds the available stock
+if (req.body.newValue > cartquant.stock) {
+    return res.json({
+        success: false,
+        message: 'Product stock limit reached!'
+    });
+}
+
 
         
 

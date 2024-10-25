@@ -39,18 +39,19 @@
 
                                     <td class="column-4">
                                         <div class="wrap-num-product flex-w m-l-auto m-r-0" id="quantityContainer">
-                                            <div class="btn-num-product-down cl8 hov-btn3 trans-04 flex-c-m">
-                                                <i class="fa-solid fa-minus"></i>
+                                            
+                                            <div id="incButton" data-offer="{{this.offerprice}}"
+                                                class="btn-num-product-up cl8 hov-btn3 trans-04 flex-c-m">
+                                                <i class="fa-solid fa-plus"></i>
                                             </div>
 
                                             <input disabled class=" mtext-104 cl3 txt-center num-product" type="number"
                                                 name="num-product{{this._id}}" id="{{this._id}}"
                                                 value="{{this.quantity}}">
-
-                                            <div id="incButton" data-offer="{{this.offerprice}}"
-                                                class="btn-num-product-up cl8 hov-btn3 trans-04 flex-c-m">
-                                                <i class="fa-solid fa-plus"></i>
+                                            <div class="btn-num-product-down cl8 hov-btn3 trans-04 flex-c-m">
+                                                <i class="fa-solid fa-minus"></i>
                                             </div>
+                                            
                                         </div>
                                     </td>
                                     <td class="text-right" data-title="Cart">
@@ -175,14 +176,7 @@
     });
 
     // Increment and Decrement quantity
-    {{!-- $('.wrap-num-product').on('click', '.fa-plus, .fa-minus', function () {
-        const cartId = $(this).closest('tr').find('.num-product').prop('id');
-        const newValue = $(this).hasClass('fa-plus') ? parseInt($(`#${cartId}`).val()) + 1 : parseInt($(`#${cartId}`).val()) - 1;
-        if (newValue > 0) {
-            $(`#${cartId}`).val(newValue);
-            updateCartItemQuantity(cartId, newValue);
-        }
-    }); --}}
+  
         $('.fa-plus, .fa-minus').click(function () {
         const cartId = $(this).closest('tr').find('.num-product').prop('id');
         const newValue = $(this).hasClass('fa-plus') ? parseInt($(`#${cartId}`).val()) + 1 : parseInt($(`#${cartId}`).val()) - 1;

@@ -37,7 +37,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.set("view engine", "hbs")
 app.set("views", path.join(__dirname, "views"))
-Handlebars.registerHelper( hbsHelper.incHelper(Handlebars), hbsHelper.incrementHelper(Handlebars), hbsHelper.mulHelper(Handlebars), hbsHelper.addHelper(Handlebars), hbsHelper.isCancelled(Handlebars), hbsHelper.formatDate(Handlebars))
+Handlebars.registerHelper( hbsHelper.incHelper(Handlebars), hbsHelper.incrementHelper(Handlebars), hbsHelper.mulHelper(Handlebars), hbsHelper.addHelper(Handlebars), hbsHelper.isCancelled(Handlebars), hbsHelper.formatDate(Handlebars), hbsHelper.isequal(Handlebars))
 
 app.use(express.static(path.join(__dirname,"public")))
 

@@ -7,7 +7,7 @@ const { viewUserProfile, EditUserProfile, updateUserProfile, changePassword, upd
 const { addAddress, addAddressPost, manageAddress, editAddress, editAddressPost, deleteAddress } = require('../controllers/userController/addressManagement')
 const { loadCartPage, addToCart, removeFromCart, updateCart } = require('../controllers/userController/cart')
 const { loadCheckoutPage, placeorder, orderSuccess } = require('../controllers/userController/checkoutManagement')
-const { getShopPage } = require('../controllers/userController/shopManagement')
+const { getProduct, searchAndSort } = require('../controllers/userController/shopManagement')
 require('../middleware/googlAuth')
 const passport = require('passport');
 const store = require("../middleware/multer")
@@ -45,7 +45,9 @@ router.get('/resetPassword', logedout, resetPasswordPage)
 router.post('/resetPassword', resetPassword)
 
 // Shop Page
-router.get('/shop', getShopPage)
+router.get('/shop', getProduct)
+router.post('/search',searchAndSort)
+
 
 // Product Detail Page
 router.get('/productDetails/:id', productDetails)
@@ -77,6 +79,8 @@ router.get('/orderPlaced', logedin, isBlocked, orderSuccess)
 
 
 router.get('/myOrders', logedin, isBlocked, my_Orders)
+
+
 
 
 module.exports = router
