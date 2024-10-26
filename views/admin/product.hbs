@@ -1,9 +1,4 @@
-<head>
-    <!-- SweetAlert2 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
-    <!-- SweetAlert2 JS -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-</head>
+
 
 
 
@@ -33,17 +28,18 @@
                                 <th class="text-center">Action </th>
                             </tr>
                         </thead>
+                        {{#if product.length}}
                         {{#each product}}
                         <tbody>
                             <tr>
-                                <td width="20%" class="text-center">
+                                <td width="30%" class="text-center">
                                     <a href="#" class="itemside">
                                         <div class="left">
                                             <img src="/assets/imgs/products/{{imageUrl.[0]}}"
                                                 class="img-sm img-thumbnail" alt="Item">
                                         </div>
                                         <div class="info pl-3">
-                                            <h6 class="mb-0 title">{{this.name}}</h6>
+                                            <h6 class="mb-0 title" >{{this.name}}</h6>
                                             <small class="text-muted">{{this.Category.category}}</small>
                                         </div>
                                     </a>
@@ -96,10 +92,14 @@
 
                         </tbody>
                         {{/each}}
-                        
+                        {{else}}
+                        <tbody>
                             <tr>
                                 <td colspan="6" class="text-center">No product Avaliable</td>
                             </tr>
+                        </tbody>
+                         {{/if}}
+                            
                        
                     </table> <!-- table-responsive.// -->
                 </div>

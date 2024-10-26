@@ -1,3 +1,4 @@
+
 // Get Login Page
 
 const getLogin = async (req, res) => {
@@ -35,7 +36,11 @@ const doLogin = async (req, res) => {
       req.session.admin = admin;
       res.redirect("/admin/home");
     } else {
-      res.render("admin/login", { layout: "adminLayout", message:"Invalid Credential", isLoginPage: true});
+      res.render("admin/login", {
+        layout: "adminLayout",
+        message: "Invalid Credential",
+        isLoginPage: true,
+      });
     }
   } catch (error) {
     console.log(error);
@@ -55,13 +60,9 @@ const doLogout = async (req, res) => {
   }
 };
 
-
-
-
-
 module.exports = {
   getLogin,
   getHome,
   doLogin,
-  doLogout
+  doLogout,
 };

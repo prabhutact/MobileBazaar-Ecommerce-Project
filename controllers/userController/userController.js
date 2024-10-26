@@ -1,143 +1,126 @@
-const Category = require("../../model/categoryModel")
-const Product = require("../../model/productModel")
-const User = require('../../model/userModel')
-const argon2 = require('argon2')
-const userHelper = require('../../helpers/user.helper')
-const Cart = require("../../model/cartModel")
-const Order = require('../../model/orderModel')
+const Category = require("../../model/categoryModel");
+const Product = require("../../model/productModel");
+const User = require("../../model/userModel");
+const argon2 = require("argon2");
+const userHelper = require("../../helpers/user.helper");
+const Cart = require("../../model/cartModel");
+const Order = require("../../model/orderModel");
 
-const mongoose = require('mongoose')
-const ObjectId=mongoose.Types.ObjectId
+const mongoose = require("mongoose");
+const ObjectId = mongoose.Types.ObjectId;
 
-let otp
-let userOtp
-let userEmail
-let hashedPassword
-let userRegData
-let userData
-
-
+let otp;
+let userOtp;
+let userEmail;
+let hashedPassword;
+let userRegData;
+let userData;
 
 // Homepage
 
 const getHome = async (req, res) => {
   try {
-    const userData = req.session.user    
+    const userData = req.session.user;
     const Products = await Product.aggregate([
       { $match: { isBlocked: false } },
       {
         $lookup: {
-          from: 'categories',
-          localField: 'category',
-          foreignField: '_id',
-          as: 'category'
-        }
+          from: "categories",
+          localField: "category",
+          foreignField: "_id",
+          as: "category",
+        },
       },
       {
-        $unwind: '$category' 
-      }
-    ])   
-    const category =await Category.find({isListed: true}).lean()
-    res.render("user/home",{category , Products , userData});
+        $unwind: "$category",
+      },
+    ]);
+    const category = await Category.find({ isListed: true }).lean();
+    res.render("user/home", { category, Products, userData });
   } catch (error) {
     console.log(error);
   }
 };
 
-
 // Get Login Page
 
 const getLogin = async (req, res) => {
-  const regSuccessMsg = 'User registered sucessfully..!!'
-  const blockMsg = 'User has been Blocked..!!'
-  const mailErr = 'Incorrect email or password..!!'  
-  const successMessage = 'Password reset successfully!'
-  
+  const regSuccessMsg = "User registered sucessfully..!!";
+  const blockMsg = "User has been Blocked..!!";
+  const mailErr = "Incorrect email or password..!!";
+  const successMessage = "Password reset successfully!";
+
   try {
     if (req.session.mailErr) {
       res.render("user/login", { mailErr });
-      req.session.mailErr = false
-    }      
-    else if (req.session.regSuccessMsg) {      
+      req.session.mailErr = false;
+    } else if (req.session.regSuccessMsg) {
       res.render("user/login", { regSuccessMsg });
-      req.session.regSuccessMsg = false
-    }
-    else if (req.session.successMessage) {      
+      req.session.regSuccessMsg = false;
+    } else if (req.session.successMessage) {
       res.render("user/login", { successMessage });
-      req.session.successMessage = false
-    }
-    
-    else if (req.session.blockMsg) {      
+      req.session.successMessage = false;
+    } else if (req.session.blockMsg) {
       res.render("user/login", { blockMsg });
-      req.session.blockMsg = false
+      req.session.blockMsg = false;
+    } else {
+      res.render("user/login");
     }
-    else {
-      res.render("user/login")
-    }
-    
   } catch (error) {
     console.log(error);
   }
-}
-
+};
 
 // Do Login
 
 const doLogin = async (req, res) => {
-
   try {
-      let email = req.body.email
-      let password = req.body.password
-      userData = await User.findOne({ email: email });
+    let email = req.body.email;
+    let password = req.body.password;
+    userData = await User.findOne({ email: email });
 
-      if (userData) {
-          if (await argon2.verify(userData.password, password)) {
+    if (userData) {
+      if (await argon2.verify(userData.password, password)) {
+        const isBlocked = userData.isBlocked;
 
-              const isBlocked = userData.isBlocked
-
-              if (!isBlocked) {
-
-                  req.session.LoggedIn = true
-                req.session.user = userData            
-                  res.redirect('/')
-              } else {
-                  //userData = null
-                  req.session.blockMsg = true
-                  res.redirect('/login')
-              }
-          }
-          else {
-              req.session.mailErr = true
-              res.redirect('/login')
-          }
+        if (!isBlocked) {
+          req.session.LoggedIn = true;
+          req.session.user = userData;
+          res.redirect("/");
+        } else {
+          //userData = null
+          req.session.blockMsg = true;
+          res.redirect("/login");
+        }
       } else {
-          req.session.mailErr = true
-          res.redirect('/login')
+        req.session.mailErr = true;
+        res.redirect("/login");
+      }
+    } else {
+      req.session.mailErr = true;
+      res.redirect("/login");
     }
   } catch (error) {
-      console.log(error);
+    console.log(error);
   }
-}
-
+};
 
 // Do Logout
 
 const doLogout = async (req, res) => {
   try {
-      req.session.destroy((err) => {
-          if (err) {
-              console.log("Logout error");
-              res.redirect("/");
-          }
-          res.redirect("/login");
-      })
-      userData = null
-
+    req.session.destroy((err) => {
+      if (err) {
+        console.log("Logout error");
+        res.redirect("/");
+      }
+      res.redirect("/login");
+    });
+    userData = null;
   } catch (error) {
-      console.log(error.message);
+    console.log(error.message);
   }
-}
-
+};
 
 // Get Signup Page
 
@@ -149,231 +132,230 @@ const getSignup = async (req, res) => {
   }
 };
 
-
 // Do Signup
 
 const doSignup = async (req, res) => {
-
   try {
-   
-    let message = '', message1='';
-    hashedPassword = await userHelper.hashPassword(req.body.password)
-    userEmail = req.body.email
-    userMobile = req.body.phone
-    userRegData = req.body
-      
-    const userExist = await User.findOne({ email: userEmail }).lean()
-    const mobileExist = await User.findOne({ mobile: userMobile }).lean()
-      if (!userExist && !mobileExist) {
-        otp = await userHelper.verifyEmail(userEmail)
-        res.render('user/submitOtp')
-      }
-      else {
-        if (userExist) {
-          req.session.message = true
-           message = "!!User Already Exist!!"
-        }
-          
-        if (mobileExist) {
-          req.session.message1 = true
-           message1 = "!!Mobile Number Already Exist!!"
-        }
-        
-        res.render('user/signup', { message, message1 });
+    let message = "",
+      message1 = "";
+    hashedPassword = await userHelper.hashPassword(req.body.password);
+    userEmail = req.body.email;
+    userMobile = req.body.phone;
+    userRegData = req.body;
+
+    const userExist = await User.findOne({ email: userEmail }).lean();
+    const mobileExist = await User.findOne({ mobile: userMobile }).lean();
+    if (!userExist && !mobileExist) {
+      otp = await userHelper.verifyEmail(userEmail);
+      res.render("user/submitOtp");
+    } else {
+      if (userExist) {
+        req.session.message = true;
+        message = "!!User Already Exist!!";
       }
 
+      if (mobileExist) {
+        req.session.message1 = true;
+        message1 = "!!Mobile Number Already Exist!!";
+      }
+
+      res.render("user/signup", { message, message1 });
+    }
   } catch (error) {
-      console.log(error);
+    console.log(error);
   }
-}
-
+};
 
 // Get otp page
 
 const getOtp = (req, res) => {
   try {
-      res.render('user/submitOtp')
+    res.render("user/submitOtp");
   } catch (error) {
-      console.log(error);
+    console.log(error);
   }
-}
-
+};
 
 // Submit Otp
 
 const submitOtp = async (req, res) => {
   try {
-      userOtp = req.body.otp;
+    userOtp = req.body.otp;
 
-
-      if (userOtp == otp) {
-          const user = new User({
-              name: userRegData.name,
-              email: userRegData.email,
-              mobile: userRegData.phone,
-              password: hashedPassword,
-              isVerified: true,
-              isBlocked: false,
-          });
-          await user.save();
-          req.session.regSuccessMsg = true;          
-          res.json({ success: true, redirectUrl: '/' });        
-      } else {
-          otpError = 'incorrect otp';          
-          res.json({ error: otpError });
-        }
+    if (userOtp == otp) {
+      const user = new User({
+        name: userRegData.name,
+        email: userRegData.email,
+        mobile: userRegData.phone,
+        password: hashedPassword,
+        isVerified: true,
+        isBlocked: false,
+      });
+      await user.save();
+      req.session.regSuccessMsg = true;
+      res.json({ success: true, redirectUrl: "/" });
+    } else {
+      otpError = "incorrect otp";
+      res.json({ error: otpError });
+    }
   } catch (error) {
-      console.log(error);      
-      res.json({ error: 'An error occurred while submitting the OTP.' });
+    console.log(error);
+    res.json({ error: "An error occurred while submitting the OTP." });
   }
 };
-
 
 // Resend Otp
 
 const resendOtp = async (req, res) => {
   try {
-    if(userEmail)
-    otp = await userHelper.verifyEmail(userEmail)
-    console.log("Sending OTP to:", email,otp); 
-    res.redirect('/submit_otp')
+    if (userEmail) otp = await userHelper.verifyEmail(userEmail);
+    console.log("Sending OTP to:", email, otp);
+    res.redirect("/submit_otp");
   } catch (error) {
-      console.log(error);
+    console.log(error);
   }
-}
-
+};
 
 //google callback
 
 const googleCallback = async (req, res) => {
   try {
-      
-      userData = await User.findOneAndUpdate(
-          { email: req.user.email },
-          { $set: { name: req.user.displayName, isVerified: true } },
-          { upsert: true, new: true }
-      );
-    console.log(userData)
-    
+    userData = await User.findOneAndUpdate(
+      { email: req.user.email },
+      { $set: { name: req.user.displayName, isVerified: true } },
+      { upsert: true, new: true }
+    );
+    console.log(userData);
+
     if (userData.isBlocked) {
       req.session.blockMsg = true;
-      res.redirect("/login")
+      res.redirect("/login");
+    } else {
+      req.session.LoggedIn = true;
+      req.session.user = userData;
+      res.redirect("/");
     }
-    else {
-      req.session.LoggedIn = true
-      req.session.user = userData
-      res.redirect('/');
-    }
-
-      
-      
   } catch (err) {
-      console.error(err);
-      res.redirect('/login');
+    console.error(err);
+    res.redirect("/login");
   }
-}
-
+};
 
 // Get Product Page
 
 const productDetails = async (req, res) => {
   try {
-    const userData = req.session.user
-    const productID = req.params.id
+    const userData = req.session.user;
+    const productID = req.params.id;
     console.log("Product ID: ", productID);
-    const product = await Product.findById(productID).lean()
+    const product = await Product.findById(productID).lean();
     console.log("Product: ", product);
-    let productExistInCart
-    let outOfStock
-    if (product.stock === 0){
-       outOfStock = true
+    let productExistInCart;
+    let outOfStock;
+
+    await Product.updateOne(
+      {
+        _id: productID,
+      },
+      {
+        $inc: {
+          popularity: 1,
+        },
+      }
+    );
+
+    if (product.stock === 0) {
+      outOfStock = true;
     }
     if (userData) {
       const ProductExist = await Cart.find({
         userId: userData._id,
-        product_Id : productID
-      })
-      
-      console.log(ProductExist)
-      if (ProductExist.length === 0) {
-        productExistInCart = false
-      }
-      else {
-        productExistInCart = true
-      }
-      
-      res.render('user/productDetails', { product, outOfStock, productExistInCart, ProductExist, userData })
-      
-    }else {
-      
-      res.render('user/productDetails', { product, outOfStock, productExistInCart: false });
-    }
-   
-    
-  } catch (error) {
-    
-  }
-}
+        product_Id: productID,
+      });
 
+      console.log(ProductExist);
+      if (ProductExist.length === 0) {
+        productExistInCart = false;
+      } else {
+        productExistInCart = true;
+      }
+
+      res.render("user/productDetails", {
+        product,
+        outOfStock,
+        productExistInCart,
+        ProductExist,
+        userData,
+      });
+    } else {
+      res.render("user/productDetails", {
+        product,
+        outOfStock,
+        productExistInCart: false,
+      });
+    }
+  } catch (error) {}
+};
 
 const my_Orders = async (req, res) => {
   try {
-      const user = req.session.user
-      const id = user._id
-      const userData = await User.findById(id).lean();
-      // const userDataObject = userData.toObject();
-      var page = 1;
-      if (req.query.page) {
-          page = req.query.page;
-      }
-      let limit = 10;
-      const skip = (page - 1) * limit;
+    const user = req.session.user;
+    const id = user._id;
+    const userData = await User.findById(id).lean();
+    // const userDataObject = userData.toObject();
+    var page = 1;
+    if (req.query.page) {
+      page = req.query.page;
+    }
+    let limit = 5;
+    const skip = (page - 1) * limit;
 
-      console.log(userData, "userdata")
-      // const Id
-      const myOrders = await Order.aggregate([
-          {
-              $match:{
-                  userId:new mongoose.Types.ObjectId(id)
-              }
-          },
-          {
-              $project:{
-                  _id:1,
-                  date:1,
-                  orderId:1,
-                  status:1,
-                  amountAfterDscnt:1,
-                  total:1,
+    console.log(userData, "userdata");
 
-              }
+    const myOrders = await Order.aggregate([
+      {
+        $match: {
+          userId: new mongoose.Types.ObjectId(id),
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          date: 1,
+          orderId: 1,
+          status: 1,
+          amountAfterDscnt: 1,
+          total: 1,
+        },
+      },
+      {
+        $sort: {
+          date: -1,
+        },
+      },
+      {
+        $skip: skip,
+      },
+      {
+        $limit: limit,
+      },
+    ]);
+    const count = await Order.find({}).countDocuments();
+    const totalPages = Math.ceil(count / limit);
+    const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 
-          },
-          {
-              $sort:{
-                  date:-1
-              }
-          },
-          {
-              $skip:skip
-          },
-          {
-              $limit:limit
-          }
-          
-      ])
-      const count = await Order.find({}).countDocuments()
-  const totalPages = Math.ceil(count / limit)  // Example value
-  const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
-
-      console.log(myOrders, "myOrders")
-      res.render('user/myOrders', { userData: userData, myOrders ,pages, currentPage: page })
-
+    console.log(myOrders, "myOrders");
+    res.render("user/myOrders", {
+      userData: userData,
+      myOrders,
+      pages,
+      currentPage: page,
+    });
   } catch (error) {
-      console.log(error.message);
-      res.status(500).send("Internal Server Error");
+    console.log(error.message);
+    res.status(500).send("Internal Server Error");
   }
-}
+};
 
 module.exports = {
   getHome,
@@ -387,5 +369,5 @@ module.exports = {
   doLogout,
   googleCallback,
   productDetails,
-  my_Orders
+  my_Orders,
 };

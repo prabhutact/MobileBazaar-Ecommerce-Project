@@ -3,33 +3,9 @@
         <section class="content-main">
             <div class="content-header">
                 <h2 class="content-title">Users list</h2>
-                <div>
-                    {{!-- <a href="#" class="btn btn-primary"><i class="material-icons md-plus"></i> Create new</a> --}}
-                </div>
+                
             </div>
-            <div class="card mb-4">
-                {{!-- <header class="card-header">
-                    <div class="row gx-3">
-                        <div class="col-lg-4 col-md-6 me-auto">
-                            <input type="text" placeholder="Search..." class="form-control">
-                        </div>
-                        <div class="col-lg-2 col-md-3 col-6">
-                            <select class="form-select">
-                                <option>Status</option>
-                                <option>Active</option>
-                                <option>Disabled</option>
-                                <option>Show all</option>
-                            </select>
-                        </div>
-                        <div class="col-lg-2 col-md-3 col-6">
-                            <select class="form-select">
-                                <option>Show 20</option>
-                                <option>Show 30</option>
-                                <option>Show 40</option>
-                            </select>
-                        </div>
-                    </div>
-                </header>  --}}
+            <div class="card mb-4">                
                 <div class="card-body ">
                     <div class="table-responsive ">
                         <table class="table table-hover ">
@@ -45,7 +21,7 @@
                             {{#each users}}
                             <tbody>
                                 <tr>
-                                    <td width="20%">
+                                    <td width="30%">
                                         <a href="#" class="itemside">
                                             <div class="left mt-5">
                                                 <img src="/assets/imgs/products/{{this.imageUrl.[0]}}" class="img-sm img-avatar" alt="Userpic" onerror="src='/assetsAdmin/imgs/people/avatar1.png'">
@@ -87,24 +63,21 @@
                 </div>
             </div> 
             <div class="pagination-area mt-15 mb-50">
-                <nav aria-label="Page navigation example">
-                    <ul class="pagination justify-content-start">
-                        <li class="page-item active"><a class="page-link" href="#">01</a></li>
-                        <li class="page-item"><a class="page-link" href="#">02</a></li>
-                        <li class="page-item"><a class="page-link" href="#">03</a></li>
-                        <li class="page-item"><a class="page-link dot" href="#">...</a></li>
-                        <li class="page-item"><a class="page-link" href="#">16</a></li>
-                        <li class="page-item"><a class="page-link" href="#"><i class="material-icons md-chevron_right"></i></a></li>
-                    </ul>
-                </nav>
-            </div>
+            <nav aria-label="Page navigation example">
+                <ul class="pagination justify-content-start">
+                    {{#each pages}}
+                    <li class="page-item active"><a class="page-link" href="?page={{this}}">{{this}}</a></li>
+                    {{/each}}
+                </ul>
+            </nav>
+        </div>
         </section> 
         <footer class="main-footer font-xs">
             <div class="row pb-30 pt-15">
                 <div class="col-sm-6">
                     <script data-cfasync="false" src="../../../cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
                     document.write(new Date().getFullYear())
-                    </script> ©, MobileBazzar .
+                    </script> ©, MobileBazaar .
                 </div>
                 <div class="col-sm-6">
                     <div class="text-sm-end">
@@ -133,7 +106,7 @@
 
             Swal.fire({
                 title: "Are you sure?",
-               // text: "Do you want to block the Product?",
+               //text: "Do you want to block the User?",
                 icon: "warning",
                 showCancelButton: true,
                 confirmButtonColor: "#088178",
@@ -158,7 +131,7 @@
                     });
                     Swal.fire({
                         title: "Done!",
-                        text: "Your file has been deleted.",
+                        //text: "User Successfully Blocked.",
                         icon: "success"
                     }).then((confirm) => {
                                     if (confirm.isConfirmed) {

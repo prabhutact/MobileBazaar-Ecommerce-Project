@@ -3,45 +3,41 @@ const fs = require("fs");
 const path = require("path");
 const Category = require("../../model/categoryModel");
 
-
-
 // Get Product Page
 
 const showProduct = async (req, res) => {
   try {
-    var page = 1
+    var page = 1;
     if (req.query.page) {
-      page = req.query.page
+      page = req.query.page;
     }
-    let limit = 3
+    let limit = 3;
     const product = await Product.aggregate([
       {
-       $lookup: {
-           from: 'categories',
-           localField: 'category',
-           foreignField: '_id',
-           as: 'Category'
-         }
+        $lookup: {
+          from: "categories",
+          localField: "category",
+          foreignField: "_id",
+          as: "Category",
+        },
       },
-       { $unwind: '$Category' },
+      { $unwind: "$Category" },
       {
-        $skip: (page - 1) * limit
+        $skip: (page - 1) * limit,
       },
       {
-        $limit: limit * 1
-      }
-    ])
-    const count = await Product.find({}).countDocuments()
-    const totalPages = Math.ceil(count / limit)  // Example value
+        $limit: limit * 1,
+      },
+    ]);
+    const count = await Product.find({}).countDocuments();
+    const totalPages = Math.ceil(count / limit); 
     const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
-    console.log(product);
-    //const product = await Product.find({}).lean();
+    console.log(product);    
     res.render("admin/product", { layout: "adminlayout", product, pages });
   } catch (error) {
     console.log(error);
   }
 };
-
 
 // Get Add Product Page
 
@@ -54,7 +50,6 @@ const addProductPage = async (req, res) => {
     console.log(error);
   }
 };
-
 
 // Add New Product
 
@@ -87,23 +82,24 @@ const addProduct = async (req, res) => {
   }
 };
 
-
-
 // Get Edit Product Page
 
 const showeditProduct = async (req, res) => {
   try {
     let productId = req.params.id;
-    
-    const productData = await Product.findById(productId).lean()
-    console.log(productData)
-    const categories = await Category.find({isListed:true}).lean()
-    res.render("admin/editProduct", { productData, categories, layout:'adminlayout' })
+
+    const productData = await Product.findById(productId).lean();
+    console.log(productData);
+    const categories = await Category.find({ isListed: true }).lean();
+    res.render("admin/editProduct", {
+      productData,
+      categories,
+      layout: "adminlayout",
+    });
   } catch (error) {
     console.log(error);
   }
 };
-
 
 // Update Product
 
@@ -112,21 +108,19 @@ const updateProduct = async (req, res) => {
     const proId = req.params.id;
     const product = await Product.findById(proId);
 
-    const exImage = product.imageUrl; 
-    const files = req.files; 
+    const exImage = product.imageUrl;
+    const files = req.files;
     let updImages = [];
 
     if (files && files.length > 0) {
-      const newImages = files.map((file) => file.filename); 
-      updImages = [...exImage, ...newImages]; 
+      const newImages = files.map((file) => file.filename);
+      updImages = [...exImage, ...newImages];
     } else {
-      updImages = exImage; 
+      updImages = exImage;
     }
 
-    
     const { name, price, description, category, stock } = req.body;
-    
-    
+
     await Product.findByIdAndUpdate(
       proId,
       {
@@ -135,58 +129,57 @@ const updateProduct = async (req, res) => {
         description: description,
         category: category,
         stock: stock,
-        isBlocked: false, 
-        imageUrl: updImages, 
+        isBlocked: false,
+        imageUrl: updImages,
       },
-      { new: true } 
+      { new: true }
     );
 
-    req.session.productSave = true; 
-    res.redirect("/admin/product"); 
-
+    req.session.productSave = true;
+    res.redirect("/admin/product");
   } catch (error) {
-    console.error('Error updating product:', error);
-    res.status(500).send('Internal Server Error');
+    console.error("Error updating product:", error);
+    res.status(500).send("Internal Server Error");
   }
 };
-
 
 const deleteProdImage = async (req, res) => {
   try {
     const { id, image } = req.query;
-  
-    console.log(`ID: ${id}, Image Index: ${image}`); // Debug log
+
+    console.log(`ID: ${id}, Image Index: ${image}`);
 
     const product = await Product.findById(id);
     if (!product) {
-      return res.status(404).send({ error: 'Product not found' });
+      return res.status(404).send({ error: "Product not found" });
     }
 
     const deletedImage = product.imageUrl.splice(image, 1)[0];
     if (!deletedImage) {
-      return res.status(400).send({ error: 'Image not found' });
+      return res.status(400).send({ error: "Image not found" });
     }
     console.log("Deleted image:", deletedImage);
 
     await product.save();
-    const imagePath = path.join(__dirname, `../../public/assets/imgs/products/${deletedImage}`);
+    const imagePath = path.join(
+      __dirname,
+      `../../public/assets/imgs/products/${deletedImage}`
+    );
     console.log("Image path:", imagePath);
 
     // Check if the file exists before attempting to delete it
     if (fs.existsSync(imagePath)) {
       fs.unlinkSync(imagePath);
     } else {
-      return res.status(404).send({ error: 'Image file not found' });
+      return res.status(404).send({ error: "Image file not found" });
     }
 
-    res.status(200).send({ message: 'Image deleted successfully' });
+    res.status(200).send({ message: "Image deleted successfully" });
   } catch (error) {
-    console.error('Error deleting image:', error); // Log the error
+    console.error("Error deleting image:", error); 
     res.status(500).send({ error: error.message });
   }
-}
-
-
+};
 
 // Block Product
 
@@ -200,13 +193,12 @@ const blockProduct = async (req, res) => {
   } catch (error) {}
 };
 
-
 module.exports = {
   showProduct,
   addProductPage,
-  addProduct,  
+  addProduct,
   showeditProduct,
   updateProduct,
   deleteProdImage,
-  blockProduct
+  blockProduct,
 };
