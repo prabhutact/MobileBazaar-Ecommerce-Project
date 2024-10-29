@@ -154,9 +154,7 @@
         $(document).on('click', '#blockprod', function (e) {
             e.preventDefault();
             var id = $(this).data('product-id');
-            //var wishId = $(this).data('whishlist-id'); // Corrected variable name to wishId
-
-            // Store reference to $(this) in a variable for use inside AJAX success and error callbacks
+            
             var $this = $(this);
 
             Swal.fire({

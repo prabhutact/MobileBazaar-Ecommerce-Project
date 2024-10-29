@@ -75,12 +75,12 @@
                         <ul class="categories">
                             {{#each loadCatData}}
                             <li>
-                                {{!-- <input type="text" hidden value="{{this._id}}" id='cat_id{{this._id}}'> --}}
+                               
                                 <a onclick="filterByCategory('{{this._id}}')">{{this.category}}</a>
                             </li>
                             {{/each}}
 
-                            {{!-- <li><a href="shop-grid-right.html">Accessories</a></li> --}}
+                            
                         </ul>
                     </div>
                     <!-- Fillter By Price -->
@@ -108,50 +108,21 @@
                     </div> --}}
                     <!-- Clear filter -->
 
-                    {{!-- <h5 class="section-title style-1 mb-30 wow fadeIn animated">Sort</h5> --}}
+                    
                     <button onclick="clearfilter()" class="btn btn-fill-out btn-block hover-up mb-30" name="login">Clear
                         filter</button>
 
 
-                    <!-- Product sidebar Widget -->
-                    {{!-- <div class="sidebar-widget product-sidebar  mb-30 p-30 bg-grey border-radius-10">
-                        <div class="widget-header position-relative mb-20 pb-10">
-                            <h5 class="widget-title mb-10">New Arrivals</h5>
-                            <div class="bt-1 border-color-1"></div>
-                        </div>
-
-                        {{#each newProduct}}
-                        <div class="single-post clearfix">
-                            <div class="image">
-                                <img src="/assets/imgs/products/{{this.imageUrl.[0]}}" alt="#">
-                            </div>
-                            <div class="content pt-10">
-                                <h6><a href="shop-product-detail.html">{{name}}</a></h6>
-                                <p class="price mb-0 mt-5">₹{{price}}</p>
-                                <div class="product-rate">
-                                    <div class="product-rating" style="width:60%"></div>
-                                </div>
-                            </div>
-                        </div>
-                        {{/each}}
-                    </div> --}}
-                    {{!-- <div class="banner-img wow fadeIn mb-45 animated d-lg-block d-none">
-                        <img src="/images/banners/Screenshot 2024-03-25 130024.png"
-                            style="width: 100%; height: 100%; object-fit: fill;" alt="">
-                        <div class="banner-text">
-                            <span>Console Zone</span>
-                            <h4>Save 17% on <br>New Consoles</h4>
-                            <a href="/productDetails/{{this._id}}">Shop Now <i class="fi-rs-arrow-right"></i></a>
-                        </div>
-                    </div> --}}
+                    
+                    
                 </div>
             </div>
         </div>
     </section>
 </main>
-{{!--
+
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script src="/javascripts/products.js"></script> --}}
+<script src="/javascripts/products.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     let currentPage = 1;
@@ -339,7 +310,6 @@
     }
 
 
-    // $('#searchButton').on('change', searchProducts);
-
+    
     fetchProducts();
 </script>

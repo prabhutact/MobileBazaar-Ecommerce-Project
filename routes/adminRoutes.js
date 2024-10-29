@@ -15,7 +15,7 @@ router.post("/admin/login" , isLogout, doLogin)
 router.get("/admin/logout",  doLogout)
 router.get("/admin/home",isLogin , getHome)
 
-// Get Product Page, Add Product & Block Product
+// Product Page
 
 router.get('/admin/product',  showProduct)
 router.get('/admin/addProduct', isLogin ,  addProductPage)
@@ -27,7 +27,7 @@ router.post('/admin/updateProduct/:id', isLogin, store.array('image', 5), update
 router.delete('/admin/product_img_delete', isLogin, deleteProdImage)
 
 
-//Get Category Page, Add Category  & Block Category
+// Category Page
 
 router.get('/admin/addCategory',isLogin  , addCategoryPage)
 router.post('/admin/addCategory', isLogin , store.single('image'), addNewCategory)
@@ -36,13 +36,14 @@ router.get('/admin/editCategory/:id',  showEditCategory)
 router.post('/admin/updateCategory/:id' , store.single('image') , updateCategory )
 
 
-// Get User Page & Block Users
+// Users Page
 
 router.get('/admin/users', isLogin, usersPage) 
 router.put('/admin/blockuser', isLogin, blockUser)
 
 
-////orders
+// Orders Page 
+
 router.get('/admin/orders', isLogin, ordersPage)
 router.get('/admin/order_details/:id', isLogin, orderDetails)
 router.post('/admin/change_status/:id',isLogin, changeStatus)

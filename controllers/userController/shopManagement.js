@@ -99,7 +99,7 @@ const searchAndSort = async (req, res) => {
       sortStage.$sort.popularity = -1;
       break;
     default:
-      sortStage.$sort.createdOn = 1;
+      sortStage.$sort.createdAt = 1;
   }
 
   const skipStage = { $skip: (page - 1) * limit };
@@ -133,6 +133,5 @@ const searchAndSort = async (req, res) => {
 };
 module.exports = {
   getProduct,
-
-  searchAndSort,
+  searchAndSort
 };
