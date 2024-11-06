@@ -8,6 +8,7 @@ const { addAddress, addAddressPost, manageAddress, editAddress, editAddressPost,
 const { loadCartPage, addToCart, removeFromCart, updateCart } = require('../controllers/userController/cart')
 const { loadCheckoutPage, placeorder, orderSuccess } = require('../controllers/userController/checkoutManagement')
 const { getProduct, searchAndSort } = require('../controllers/userController/shopManagement')
+const { showWishlistPage, addToWishList, removeFromWishList } = require('../controllers/userController/wishlistManagement')
 require('../middleware/googlAuth')
 const passport = require('passport');
 const store = require("../middleware/multer")
@@ -94,6 +95,13 @@ router.post('/updatecart', updateCart)
 router.get('/cart/checkout', logedin, isBlocked, loadCheckoutPage)
 router.post('/placeorder', placeorder)
 router.get('/orderPlaced', logedin, isBlocked, orderSuccess)
+
+
+// Wishlist Page
+
+router.get('/wishlist', logedin, isBlocked, showWishlistPage)
+router.post('/addtowishlist', logedin, isBlocked, addToWishList)
+router.post('/removeFromWishList', logedin, isBlocked, removeFromWishList)
 
 
 

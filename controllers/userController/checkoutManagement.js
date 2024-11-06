@@ -4,6 +4,7 @@ const Category = require("../../model/categoryModel");
 const User = require("../../model/userModel");
 const { Address } = require("../../model/addressSchema");
 const Order = require("../../model/orderModel");
+const Coupon=require('../../model/couponSchema')
 
 const mongoose = require("mongoose");
 const ObjectId = require("mongoose");
@@ -16,7 +17,8 @@ const loadCheckoutPage = async (req, res) => {
 
     console.log(userData._id);
     const addressData = await Address.find({ userId: userData._id }).lean();
-    console.log(addressData);
+    let coupon= await Coupon.find().lean()
+    
 
     const subTotal = await Cart.aggregate([
       {
@@ -65,13 +67,14 @@ const loadCheckoutPage = async (req, res) => {
       },
     ]);
     console.log(cart);
-    console.log(subTotal, "SUBTOTAL");
+    
 
     res.render("user/checkout", {
       userData,
       addressData,
       subTotal: subTotal[0].total,
       cart,
+      coupon
     });
   } catch (error) {
     console.log(error.message);

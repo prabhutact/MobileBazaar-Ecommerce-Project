@@ -92,6 +92,10 @@
     .otp-field input::-webkit-outer-spin-button {
       display: none;
     }
+
+    .not-allowed {
+  cursor: not-allowed;
+}
     
   </style>
 
@@ -144,12 +148,14 @@
     timerElement.textContent = countdown;
     countdown--;
     resendButton.disabled = true;
+    resendButton.classList.add('not-allowed');
     if (countdown < 0) {
       clearInterval(countdownInterval);
       timerElement.textContent = '';
       timerText.style.display = 'none'; // Hide timer message
       //document.querySelector('.text-primary.my-3').textContent = '';
       resendButton.disabled = false;
+      resendButton.classList.remove('not-allowed');
     }
   }
 
@@ -160,6 +166,7 @@
     timerElement.textContent = countdown
     timerText.style.display = 'block';
     resendButton.disabled = true;
+    resendButton.classList.add('not-allowed');
 
     countdownInterval = setInterval(updateTimer, 1000);
   }
