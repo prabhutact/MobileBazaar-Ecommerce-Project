@@ -270,12 +270,95 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
 <script>
-    //let couponData
-    //let couponEl
+    let couponData
+    let couponEl
     let newTotal
     let subTotal
-    //let updateWallet
+    let updateWallet
     let ct=0
+
+    let couponStatus
+    let originalSubTotal = Number(document.getElementsByName('subTotal')[0].value) ;
+
+const validateCoupon = async () => {
+    couponEl = document.getElementById('copon').value;
+    subTotal = Number(document.getElementsByName('subTotal')[0].value);
+
+    console.log(couponEl);
+    console.log('heloooo from validate coupon...............');
+    const response = await fetch('/validate_coupon', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            couponVal: couponEl,
+            subTotal: subTotal
+        })
+    });
+
+    console.log('hiiiii from coupon status........;;;;;;');
+    couponData = await response.json();
+    console.log(couponData);
+
+    
+};
+    const toggleCoupon = async () => {
+        ct+=1
+        console.log(ct,"ctttttttttttttttttttttttttttt")
+         couponEl = document.getElementById('copon').value;
+         currentStatus = document.getElementById('couponBtn').innerText.trim();
+         endpoint = currentStatus === 'Apply' ? '/apply_coupon' : '/remove_coupon';
+
+        const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ couponVal: couponEl, subTotal: originalSubTotal })
+        });
+
+         couponData = await response.json();
+
+        const setCouponStatus = (msg, element) => {
+            element.innerHTML = `<p>${msg}</p>`;
+            setTimeout(() => {
+                element.style.opacity = 0;
+                element.innerHTML = '';
+            }, 2000);
+        };
+
+        const couponMsg = document.getElementById('couponMsg');
+        const sCoponMsg = document.getElementById('sCoponMsg');
+
+        if (couponData.status === 'invalid') {
+            ct=0
+            setCouponStatus('Invalid coupon', couponMsg);
+        } else if (couponData.status === 'expired') {
+            ct=0
+            setCouponStatus('Coupon has expired!', couponMsg);
+        } else if (couponData.status === 'already_used') {
+            ct=0
+            setCouponStatus('Coupon already used!', couponMsg);
+        } else if (couponData.status === 'not_used') {
+            ct=0
+            setCouponStatus('Coupon not used yet!', couponMsg);
+        } else if (couponData.status === 'removed') {            
+            setCouponStatus('Coupon removed successfully', couponMsg);
+            document.getElementById('couponBtn').innerHTML = '<i class="fi-rs-label mr-10"></i>Apply';
+        } else if (couponData.status === 'applied') {
+            setCouponStatus('Coupon applied successfully', sCoponMsg);
+            document.getElementById('couponBtn').innerHTML = '<i class="fi-rs-label mr-10"></i>Remove';
+        }
+
+        if (couponData.status === 'applied' || couponData.status === 'removed') {
+            document.getElementById('new_sub_total').innerHTML = `<strong>${couponData.newTotal + 50}</strong>`;
+            document.getElementsByName('subTotal')[0].value = couponData.newTotal + 50;
+            document.getElementById('copoun_code').innerHTML = `<small>${couponEl}</small>`;
+            document.getElementById('discount_amt').innerHTML = `<span class="text-success">-${couponData.discountAmt}</span>`;
+        }
+    };
+
 
 
     const paymentOption = document.querySelectorAll('input[name="payment_option"]');
@@ -297,16 +380,11 @@
 
 
     const placeOrder = () => {
-    console.log('place order triggered');
-    const selectedAddress = document.getElementById('selectedAddress').value;
-    
-    // Check if an address is selected
+    const selectedAddress = document.getElementById('selectedAddress').value;   
     if (!selectedAddress) {
-        Swal.fire('Error', 'Please select a delivery address.', 'error');
+        Swal.fire('Warning', 'Please select a delivery address.', 'error');
         return;
     }
-    
-    // Confirmation dialog
     Swal.fire({
         title: 'Confirm Order',
         text: "Are you sure you want to place the order?",
@@ -340,11 +418,46 @@
     });
 }
 
+const useWallet = () => {
+        const wallet = document.getElementsByName('wallet')[0].value
+        const subTotal = Number(document.getElementsByName('subTotal')[0].value)
+        console.log(wallet, 'walletttttttttttt', subTotal)
 
+        if (wallet > subTotal) {
+            updateWallet = wallet - subTotal
+
+            console.log(updateWallet, 'my name is update wallet...........')
+            Cod()
+        } else {
+            alertify.set('notifier', 'position', 'bottom-center');
+            //alertify.success('you dont have sufficient balance in ur wallet choose another payment method')
+            Swal.fire({
+                icon: 'error',
+                title: 'Insufficient Balance',
+                text: 'You don’t have sufficient balance in your wallet. Please choose another payment method.',
+                confirmButtonText: 'OK'
+            });
+        }
+    }
+
+let paymentStatus = true;
 
     const Cod = async () => {
         const selectAddress = document.querySelector('#selectedAddress').value
         const subTotal = Number(document.getElementsByName('subTotal')[0].value) 
+
+        let requestBody = {
+            selectedAddress: selectAddress,
+            selectedPayment: paymentMethod,
+            amount: subTotal,
+            couponData: couponData,
+            couponName: couponEl,
+            updateWallet: updateWallet
+        };
+
+        if (!paymentStatus) {
+            requestBody.status = "Payment Failed";
+        }
 
         const datas = await fetch('/placeorder', {
             method: 'POST',
@@ -352,35 +465,209 @@
                 'Content-Type': "application/json",
             },
 
-            body: JSON.stringify({
-
-                selectedAddress: selectAddress,
-                selectedPayment: paymentMethod,
-                amount: subTotal,
-                couponData: couponData,
-                couponName: couponEl,
-                updateWallet: updateWallet
-            })
+            body: JSON.stringify({requestBody})
         })
 
         const placeOrderData = await datas.json()
-        console.log(datas.COD, datas, "placeOrderData")
+        
 
         if (placeOrderData) {
-            console.log(' hiiii am from place oreder data')
-
-            //const wallet = document.getElementById('update_wallet').innerText = updateWallet
+            console.log('Received placeOrderData:', placeOrderData);
+            if (paymentStatus) {
             window.location.href = '/orderPlaced'
         }
-        if (!COD) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Oops...',
-                text: 'Something went wrong!',
-
-            })
-
+        else {
+                // Show an alert and redirect to the payment_failed route
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Payment Failed',
+                    text: 'Your payment could not be processed. Please try again later or use a different payment method.',
+                    confirmButtonText: 'OK'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = '/payment_failed';
+                    }
+                });
+            }
         }
+    } catch (error) {
+        console.error('Error placing order:', error);
+        // Optionally handle the error, e.g., show a notification to the user
     }
 
+    const online = () => {
+        if(ct===0) {
+            subTotal = Number(document.getElementsByName('subTotal')[0].value) + 50
+        }else{
+            subTotal = Number(document.getElementsByName('subTotal')[0].value) 
+        }
+        
+
+
+        var options = {
+            "key": "rzp_test_OsDtnewxAfAwm0", // Enter the Key ID generated from the Dashboard
+            "amount": (subTotal)* 100, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+            "currency": "INR",
+            "image": "/images/logo/Logo_CH.png",
+
+            /*"name": "Acme Corp", //your business name
+            "description": "Test Transaction",
+            "image": "https://example.com/your_logo",*/
+
+            "order_id":  undefined, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+            "handler": function (response) {
+                //console.log(response.razorpayOrder, status);
+              //  verifyPayment(response.razorpayOrder, status, response.razorpayOrder.id, response.orderId);
+                Cod()
+            },
+
+        };
+        var rzp1 = new Razorpay(options);
+        rzp1.open();
+         rzp1.on('payment.failed', function (response) {
+            console.error('Payment failed:', response.error.code, response.error.description);
+            $.ajax({
+                url: '/handle-failure',
+                method: 'post',
+                data: {
+                    error: response.error,
+                    payment_method: paymentMethod,
+                    order_id: options.order_id // Make sure to pass the correct order ID
+                },
+                success: (result) => {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Payment Failed',
+                        text: 'Payment has failed. Please try again.'
+                    }).then(function () {
+                        window.location.href = '/orderFailed'; // Redirect to an order failed page
+                    });
+                }
+            });
+        });
+
+
+    }
+    
+
+
+    
+
+
+        function verifyPayment(response, order) {
+
+            $.ajax({
+                url: '/verify-payment',
+                method: 'post',
+                data: {
+                    order,
+                    response,
+                    from: "wallet"
+                }, success: (response) => {
+                    if (response) {
+                        Swal.fire({
+                            title: "Success",
+                            text: "Payment has been succeed",
+                            icon: "success",
+
+                        }).then(function () {
+                            location.reload()
+                        });
+                    } else {
+                        Swal.fire("PAYMENT ERROR!", "Something wrong occured while processing the payment.", "error");
+                        location.reload()
+                    }
+
+                }
+            })
+        }
+
+
+
+
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.querySelector('form[action="/add_address"]');
+        const submitButton = document.getElementById('submitButton');
+        const nameField = document.getElementById('name');
+        const mobileField = document.getElementById('mobile');
+        const address1Field = document.getElementById('address1');
+        const address2Field = document.getElementById('address2');
+        const cityField = document.getElementById('city');
+        const stateField = document.getElementById('state');
+        const pincodeField = document.getElementById('pincode');
+        const nameError = document.getElementById('nameError');
+        const mobileError = document.getElementById('mobileError');
+        const address1Error = document.getElementById('address1Error');
+        const cityError = document.getElementById('cityError');
+        const stateError = document.getElementById('stateError');
+        const pincodeError = document.getElementById('pincodeError');
+
+        form.addEventListener('submit', function (event) {
+            let isValid = true;
+
+
+            clearErrors();
+
+            if (nameField.value.trim() === '') {
+                isValid = false;
+                showError(nameError, 'Name is required.');
+            }
+
+            if (mobileField.value.trim() === '') {
+                isValid = false;
+                showError(mobileError, 'Phone number is required.');
+            } else if (!/^\d{10}$/.test(mobileField.value.trim())) {
+                isValid = false;
+                showError(mobileError, 'Phone number must be 10 digits.');
+            }
+
+            if (address1Field.value.trim() === '') {
+                isValid = false;
+                showError(address1Error, 'Address line 1 is required.');
+            }
+
+            if (cityField.value.trim() === '') {
+                isValid = false;
+                showError(cityError, 'City is required.');
+            }
+
+            if (stateField.value.trim() === '') {
+                isValid = false;
+                showError(stateError, 'State is required.');
+            }
+
+            if (pincodeField.value.trim() === '') {
+                isValid = false;
+                showError(pincodeError, 'Pincode is required.');
+            } else if (!/^\d{6}$/.test(pincodeField.value.trim())) {
+                isValid = false;
+                showError(pincodeError, 'Pincode must be 6 digits.');
+            }
+
+            if (!isValid) {
+                event.preventDefault();
+            }
+        });
+
+        function showError(element, message) {
+            element.innerText = message;
+            element.style.color = 'red';
+        }
+
+        function clearErrors() {
+            nameError.innerText = '';
+            mobileError.innerText = '';
+            address1Error.innerText = '';
+            cityError.innerText = '';
+            stateError.innerText = '';
+            pincodeError.innerText = '';
+        }
+    });
+</script>
+
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     

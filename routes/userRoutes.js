@@ -6,7 +6,7 @@ const { submitMail, submitMailPost, forgotOtppage, forgotOtpSubmit, resetPasswor
 const { viewUserProfile, EditUserProfile, updateUserProfile, changePassword, updatePassword } = require('../controllers/userController/profile')
 const { addAddress, addAddressPost, manageAddress, editAddress, editAddressPost, deleteAddress } = require('../controllers/userController/addressManagement')
 const { loadCartPage, addToCart, removeFromCart, updateCart } = require('../controllers/userController/cart')
-const { loadCheckoutPage, placeorder, orderSuccess } = require('../controllers/userController/checkoutManagement')
+const { loadCheckoutPage, placeorder, orderSuccess, validateCoupon, applyCoupon, removeCoupon } = require('../controllers/userController/checkoutManagement')
 const { getProduct, searchAndSort } = require('../controllers/userController/shopManagement')
 const { showWishlistPage, addToWishList, removeFromWishList } = require('../controllers/userController/wishlistManagement')
 require('../middleware/googlAuth')
@@ -96,6 +96,9 @@ router.get('/cart/checkout', logedin, isBlocked, loadCheckoutPage)
 router.post('/placeorder', placeorder)
 router.get('/orderPlaced', logedin, isBlocked, orderSuccess)
 
+router.post('/validate_coupon', logedin, isBlocked, validateCoupon)
+router.post('/apply_coupon',applyCoupon)
+router.post('/remove_coupon',removeCoupon)
 
 // Wishlist Page
 
