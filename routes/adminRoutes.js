@@ -5,7 +5,7 @@ const { showProduct, addProductPage, addProduct, blockProduct, showeditProduct, 
 const { addCategoryPage, addNewCategory, showCategoryPage, unListCategory, showEditCategory, updateCategory } = require('../controllers/adminController/categoryManagement');
 const { usersPage, blockUser } = require('../controllers/adminController/UserManagement');
 const { ordersPage, orderDetails, changeStatus } = require('../controllers/adminController/ordersManagement');
-const { couponPage, addCouponPage, addCouponPost, deleteCoupon } = require('../controllers/adminController/couponManagement');
+const { couponPage, addCouponPage, addCouponPost, editCouponPage, editCouponPost, deleteCoupon } = require('../controllers/adminController/couponManagement');
 const { isLogin, isLogout } = require("../middleware/adminAuth")
 const store = require('../middleware/multer')
 
@@ -53,7 +53,9 @@ router.post('/admin/change_status/:id', isLogin, changeStatus)
 // coupon
 router.get('/admin/coupons',isLogin,couponPage)
 router.get('/admin/addcoupon',isLogin,addCouponPage)
-router.post('/admin/add_coupon',isLogin, addCouponPost)
+router.post('/admin/add_coupon', isLogin, addCouponPost)
+router.get('/admin/editcoupon/:id', editCouponPage);
+router.post('/admin/editcoupon/:id', editCouponPost);
 router.delete('/admin/delete_coupon',isLogin,deleteCoupon)
 
 

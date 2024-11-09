@@ -1,4 +1,5 @@
-const Coupon=require('../../model/couponSchema')
+const Coupon = require('../../model/couponSchema')
+const moment = require('moment');
 
 
 
@@ -8,19 +9,13 @@ const couponPage= async(req,res)=>{
         const couponData = await Coupon.find().lean();
         console.log(couponData);
 
-       // const now = moment();
+       
+        const couponMsg = req.session.couponMsg;        
+        req.session.couponMsg = null;
+        const couponExMsg = req.session.couponExMsg;        
+        req.session.couponExMsg = null;
     
-        // const couponData = coupon.map((cpn) => {
-        //   const formattedDate = moment(cpn.expiryDate).format("MMMM D, YYYY");
-    
-        //   return {
-        //     ...cpn,
-        //     expiryDate: formattedDate,
-        //   };
-        // });
-    
-    
-        res.render('admin/coupon',{couponData, title:"Admin",layout:'adminlayout'})
+        res.render('admin/coupon',{couponData, couponMsg, couponExMsg, title:"Admin",layout:'adminlayout'})
     } catch (error) {
 
         console.log(error.message);
@@ -90,16 +85,66 @@ const addCouponPost = async (req, res) => {
 
           await coupon.save();
           req.session.couponMsg = 'Coupon added successfully';
-          res.redirect("/admin/addcoupon");
+          res.redirect("/admin/coupons");
       } else {
           req.session.couponExMsg = 'Coupon already exists';
-          res.redirect("/admin/addcoupon");
+          res.redirect("/admin/coupons");
       }
   } catch (error) {
       console.error('Error adding coupon:', error.message);
       res.status(500).send("Internal Server Error");
   }
 };
+
+
+const editCouponPage = async (req, res) => {
+    const { id } = req.params;
+    try {
+        console.log('Coupon ID:', id); 
+        const coupon = await Coupon.findById(id).lean();
+        if (!coupon) {
+            return res.status(404).send("Coupon not found");
+        }
+        if (coupon) {
+            // Format expiry date before passing to the view
+            coupon.expiryDate = moment(coupon.expiryDate).format('YYYY-MM-DD');
+        }
+        res.render("admin/editCoupon", { coupon, title: "Edit Coupon", layout: "adminlayout" });
+        
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).send("Internal Server Error");
+    }
+};
+
+const editCouponPost = async (req, res) => {
+    try {
+        const { code, discount, expDate, minPurchase, maxDiscount } = req.body;
+        const couponId = req.params.id;
+  
+        // Find the coupon by ID and update the details
+        const coupon = await Coupon.findById(couponId);
+        if (!coupon) {
+            return res.status(404).send("Coupon not found");
+        }
+  
+        // Update coupon fields
+        coupon.code = code;
+        coupon.discount = parseFloat(discount);
+        coupon.expiryDate = new Date(expDate);
+        coupon.minPurchase = parseFloat(minPurchase);
+        coupon.maxDiscount = parseFloat(maxDiscount);
+  
+        // Save the updated coupon
+        await coupon.save();
+  
+        req.session.couponMsg = 'Coupon updated successfully';
+        res.redirect('/admin/coupons'); // Redirect to the coupons list page
+    } catch (error) {
+        console.error('Error updating coupon:', error.message);
+        res.status(500).send("Internal Server Error");
+    }
+  };
 
 
   const deleteCoupon= async(req,res)=>{
@@ -115,9 +160,13 @@ const addCouponPost = async (req, res) => {
         
     }
   }
+
+
 module.exports={
     couponPage,
     addCouponPage,
     addCouponPost,
+    editCouponPage,
+    editCouponPost,
     deleteCoupon
 }

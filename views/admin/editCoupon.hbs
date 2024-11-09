@@ -1,0 +1,138 @@
+{{!-- <head>
+    <style>
+        /* Apply the color to all buttons */
+        button, .btn {
+            background-color: #088178;
+            border-color: #088178;
+            color: white;
+        }
+
+        /* Add hover effect */
+        button:hover, .btn:hover {
+            background-color: #066a62;
+            border-color: #066a62;
+            color: white;
+        }
+
+        /* Add active state effect */
+        button:active, .btn:active {
+            background-color: #055c56;
+            border-color: #055c56;
+            color: white;
+        }
+
+        /* Focus state for accessibility */
+        button:focus, .btn:focus {
+            box-shadow: 0 0 0 0.2rem rgba(8, 129, 120, 0.5);
+            border-color: #088178;
+        }
+    </style>
+</head> --}}
+
+<main class="main-wrap">
+    <section class="content-main">
+        <div class="row justify-content-center align-items-center">
+            {{!-- <div class="col-10">
+                <div class="content-header">
+                    <h2 class="content-title">Edit Coupon</h2>
+                </div>
+            </div> --}}
+            <div class="col-lg-8 mt-5 justify-content-center">
+                <div class="card">
+                    <div class="card-body">
+                        
+                        <!-- Edit coupon form -->
+                        <form action="/admin/editcoupon/{{coupon._id}}" method="POST" onsubmit="return validationf(this)" class="row g-3">
+                            <h5 class="content-title">Edit Coupon Details</h5>
+
+                            <div class="col-12">
+                                <label for="coupon-code" class="form-label">Coupon Code</label>
+                                <input type="text" class="form-control" id="coupon-code" name="code" value="{{coupon.code}}" required>
+                                <h6 class="alertAddcoupon mt-1" style="color: red" id="couponcodealert"></h6>
+                            </div>
+
+                            <div class="col-12">
+                                <label for="discount" class="form-label">Discount (%)</label>
+                                <div class="input-group mb-3">
+                                    <input type="number" class="form-control" id="discount" name="discount" value="{{coupon.discount}}" required>
+                                    <span class="input-group-text">%</span>
+                                    <h6 class="alertAddcoupon mt-1" style="color: red" id="discountalert"></h6>
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <label for="min-purchase" class="form-label">Minimum Purchase Amount</label>
+                                <input type="number" class="form-control" id="min-purchase" name="minPurchase" value="{{coupon.minPurchase}}" required>
+                                <h6 class="alertAddcoupon mt-1" style="color: red" id="minalert"></h6>
+                            </div>
+
+                            <div class="col-12">
+                                <label for="max-discount" class="form-label">Max Discount Amount</label>
+                                <div class="input-group mb-3">
+                                    <input type="number" class="form-control" id="max-discount" name="maxDiscount" value="{{coupon.maxDiscount}}" required>
+                                    <h6 class="alertAddcoupon mt-1" style="color: red" id="maxalert"></h6>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="expiry-date">Expiry Date</label>
+                                <input type="date" class="form-control" id="expiry-date" name="expDate" value="{{coupon.expiryDate}}" required>
+                            </div>
+
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-primary">Save Changes</button>
+                                <a href="/admin/coupons" class="btn btn-primary" id="cancelbutton">Cancel</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <footer class="main-footer font-xs">
+        <div class="row pb-30 pt-15">
+            <div class="col-sm-6">
+                <script>
+                    document.write(new Date().getFullYear())
+                </script> ©, MobileBazaar .
+            </div>
+            <div class="col-sm-6">
+                <div class="text-sm-end">
+                    All rights reserved
+                </div>
+            </div>
+        </div>
+    </footer>
+</main>
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+<script>
+    
+    // Back Button
+
+    $(document).ready(function () {
+        $('#cancelbutton').click(function (e) {
+            e.preventDefault();
+
+            Swal.fire({
+                title: "Leave the page?",
+                text: "The Data will not be saved",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#088178",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = "/admin/coupons";
+
+                }
+            });
+            
+        });
+    });
+</script>

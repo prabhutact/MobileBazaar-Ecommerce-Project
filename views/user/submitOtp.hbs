@@ -47,6 +47,10 @@
     <a style="cursor: not-allowed;" href="/resend_otp" id="resendLink">Resend OTP</a>
 </button>
 
+
+   
+
+
                           
 
                     </div>
@@ -106,156 +110,368 @@
 
 </main>
 
-<script>
+{{!-- <script>
 
-      setTimeout(function() {
-        // Change cursor to pointer after 10 seconds
-        document.getElementById('resendButton').style.cursor = 'pointer';
-        document.getElementById('resendLink').style.cursor = 'pointer';
-    }, 11000); // 10000 ms = 10 seconds
+    const form = document.getElementById('otp-form');
 
-  const form = document.getElementById('otp-form');
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault(); // prevent page reload
 
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault(); // prevent page reload
+        const digit1 = document.getElementById('digit1').value;
+        const digit2 = document.getElementById('digit2').value;
+        const digit3 = document.getElementById('digit3').value;
+        const digit4 = document.getElementById('digit4').value;
 
-    const digit1 = document.getElementById('digit1').value;
-    const digit2 = document.getElementById('digit2').value;
-    const digit3 = document.getElementById('digit3').value;
-    const digit4 = document.getElementById('digit4').value;
+        const otp = digit1 + digit2 + digit3 + digit4;
+        console.log(otp)
+        try {
+            const response = await fetch('/submit_otp', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ otp }),
+            });
 
-    const otp = digit1 + digit2 + digit3 + digit4;
-    console.log(otp)
-    try {
-      const response = await fetch('/submit_otp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ otp }),
-      });
+            const result = await response.json();
 
-      const result = await response.json();
+            if (result.error) {
+                // display error message
+                document.getElementById('otp-error').textContent = result.error;
+            } else {
+                // OTP is correct, redirect to login page
+                window.location.href = '/login';
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    });
 
-      if (result.error) {
-        // display error message
-        document.getElementById('otp-error').textContent = result.error;
-      } else {
-        // OTP is correct, redirect to login page
-        window.location.href = '/login';
-      }
-    } catch (error) {
-      console.error(error);
+    let countdown = 10;
+    let timerElement = document.getElementById('timer');
+    let resendButton = document.getElementById('resendButton');
+    let resendLink = document.getElementById('resendLink');
+    let countdownInterval;
+    let timerText = document.querySelector('.text-primary.my-3');
+
+    function updateTimer() {
+        timerElement.textContent = countdown;
+        countdown--;
+
+        if (countdown < 0) {
+            clearInterval(countdownInterval);
+            timerElement.textContent = '';
+            timerText.style.display = 'none'; // Hide timer message
+
+            resendButton.disabled = false;
+            resendButton.classList.remove('not-allowed');
+            resendButton.style.cursor = 'pointer';
+            resendLink.style.cursor = 'pointer';
+        }
     }
-  });
 
+    function resendOTP() {
+        clearInterval(countdownInterval); // Clear any previous interval
+        countdown = 10;
+        timerElement.textContent = countdown;
+        timerText.style.display = 'block';
+        
+        resendButton.disabled = true;
+        resendButton.classList.add('not-allowed');
+        resendButton.style.cursor = 'not-allowed';
+        resendLink.style.cursor = 'not-allowed';
 
-
-  let countdown = 10;
-  let timerElement = document.getElementById('timer');
-  let resendButton = document.getElementById('resendButton');
-  let countdownInterval;
-  let timerText = document.querySelector('.text-primary.my-3');
-
-  function updateTimer() {
-    timerElement.textContent = countdown;
-    countdown--;
-    //resendButton.disabled = true;
-    //resendButton.classList.add('not-allowed');
-    if (countdown < 0) {
-      clearInterval(countdownInterval);
-      timerElement.textContent = '';
-      timerText.style.display = 'none'; // Hide timer message
-      //document.querySelector('.text-primary.my-3').textContent = '';
-      resendButton.disabled = false;
-      resendButton.classList.remove('not-allowed');
+        countdownInterval = setInterval(updateTimer, 1000);
     }
-  }
-
-  function resendOTP() {
-
-
-    countdown = 10;
-    timerElement.textContent = countdown
-    timerText.style.display = 'block';
-    resendButton.disabled = true;
-    resendButton.classList.add('not-allowed');
 
     countdownInterval = setInterval(updateTimer, 1000);
-  }
-  
 
+    const inputs = document.querySelectorAll(".otp-field > input");
+    const button = document.querySelector(".btn");
 
-  countdownInterval = setInterval(updateTimer, 1000);
+    window.addEventListener("load", () => inputs[0].focus());
+    button.setAttribute("disabled", "disabled");
 
+    inputs[0].addEventListener("paste", function (event) {
+        event.preventDefault();
 
+        const pastedValue = (event.clipboardData || window.clipboardData).getData("text");
+        const otpLength = inputs.length;
 
-
-  const inputs = document.querySelectorAll(".otp-field > input");
-  const button = document.querySelector(".btn");
-
-  window.addEventListener("load", () => inputs[0].focus());
-  button.setAttribute("disabled", "disabled");
-
-  inputs[0].addEventListener("paste", function (event) {
-    event.preventDefault();
-
-    const pastedValue = (event.clipboardData || window.clipboardData).getData(
-      "text"
-    );
-    const otpLength = inputs.length;
-
-    for (let i = 0; i < otpLength; i++) {
-      if (i < pastedValue.length) {
-        inputs[i].value = pastedValue[i];
-        inputs[i].removeAttribute("disabled");
-        inputs[i].focus;
-      } else {
-        inputs[i].value = ""; // Clear any remaining inputs
-        inputs[i].focus;
-      }
-    }
-  });
-
-  inputs.forEach((input, index1) => {
-    input.addEventListener("keyup", (e) => {
-      const currentInput = input;
-      const nextInput = input.nextElementSibling;
-      const prevInput = input.previousElementSibling;
-
-      if (currentInput.value.length > 1) {
-        currentInput.value = "";
-        return;
-      }
-
-      if (
-        nextInput &&
-        nextInput.hasAttribute("disabled") &&
-        currentInput.value !== ""
-      ) {
-        nextInput.removeAttribute("disabled");
-        nextInput.focus();
-      }
-
-      if (e.key === "Backspace") {
-        inputs.forEach((input, index2) => {
-          if (index1 <= index2 && prevInput) {
-            input.setAttribute("disabled", true);
-            input.value = "";
-            prevInput.focus();
-          }
-        });
-      }
-
-      button.classList.remove("active");
-      button.setAttribute("disabled", "disabled");
-
-      const inputsNo = inputs.length;
-      if (!inputs[inputsNo - 1].disabled && inputs[inputsNo - 1].value !== "") {
-        button.classList.add("active");
-        button.removeAttribute("disabled");
-
-        return;
-      }
+        for (let i = 0; i < otpLength; i++) {
+            if (i < pastedValue.length) {
+                inputs[i].value = pastedValue[i];
+                inputs[i].removeAttribute("disabled");
+                inputs[i].focus;
+            } else {
+                inputs[i].value = ""; // Clear any remaining inputs
+                inputs[i].focus;
+            }
+        }
     });
-  });
 
+    inputs.forEach((input, index1) => {
+        input.addEventListener("keyup", (e) => {
+            const currentInput = input;
+            const nextInput = input.nextElementSibling;
+            const prevInput = input.previousElementSibling;
+
+            if (currentInput.value.length > 1) {
+                currentInput.value = "";
+                return;
+            }
+
+            if (nextInput && nextInput.hasAttribute("disabled") && currentInput.value !== "") {
+                nextInput.removeAttribute("disabled");
+                nextInput.focus();
+            }
+
+            if (e.key === "Backspace") {
+                inputs.forEach((input, index2) => {
+                    if (index1 <= index2 && prevInput) {
+                        input.setAttribute("disabled", true);
+                        input.value = "";
+                        prevInput.focus();
+                    }
+                });
+            }
+
+            button.classList.remove("active");
+            button.setAttribute("disabled", "disabled");
+
+            const inputsNo = inputs.length;
+            if (!inputs[inputsNo - 1].disabled && inputs[inputsNo - 1].value !== "") {
+                button.classList.add("active");
+                button.removeAttribute("disabled");
+                return;
+            }
+        });
+    });
+
+</script> --}}
+
+{{!-- <script>
+    const form = document.getElementById('otp-form');
+    const timerElement = document.getElementById('timer');
+    const resendButton = document.getElementById('resendButton');
+    const resendLink = document.getElementById('resendLink');
+    const timerText = document.querySelector('.text-primary.my-3');
+    const inputs = document.querySelectorAll(".otp-field > input");
+    const button = document.querySelector(".btn");
+
+    let countdown = 10;
+    let countdownInterval;
+
+    // Start initial countdown when page loads
+    startCountdown();
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const otp = Array.from(inputs).map(input => input.value).join('');
+        console.log(otp);
+
+        try {
+            const response = await fetch('/submit_otp', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ otp }),
+            });
+
+            const result = await response.json();
+            if (result.error) {
+                document.getElementById('otp-error').textContent = result.error;
+            } else {
+                window.location.href = '/login';
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    });
+
+    function startCountdown() {
+        countdown = 10;
+        timerElement.textContent = countdown;
+        timerText.style.display = 'block';
+        disableResendButton();
+
+        countdownInterval = setInterval(() => {
+            countdown--;
+            timerElement.textContent = countdown;
+            
+            if (countdown <= 0) {
+                clearInterval(countdownInterval);
+                timerElement.textContent = '';
+                timerText.style.display = 'none';
+                enableResendButton();
+            }
+        }, 1000);
+    }
+
+    function resendOTP() {
+        clearInterval(countdownInterval); // Clear any previous countdown
+        startCountdown(); // Restart countdown when Resend OTP is clicked
+    }
+
+    function disableResendButton() {
+        resendButton.disabled = true;
+        resendButton.classList.add('not-allowed');
+        resendButton.style.cursor = 'not-allowed';
+        resendLink.style.pointerEvents = 'none';
+        resendLink.style.cursor = 'not-allowed';
+    }
+
+    function enableResendButton() {
+        resendButton.disabled = false;
+        resendButton.classList.remove('not-allowed');
+        resendButton.style.cursor = 'pointer';
+        resendLink.style.pointerEvents = 'auto';
+        resendLink.style.cursor = 'pointer';
+    }
+
+    window.addEventListener("load", () => inputs[0].focus());
+    button.setAttribute("disabled", "disabled");
+
+    inputs.forEach((input, index1) => {
+        input.addEventListener("keyup", (e) => {
+            const nextInput = input.nextElementSibling;
+            const prevInput = input.previousElementSibling;
+
+            if (input.value.length > 1) input.value = input.value.charAt(0);
+
+            if (nextInput && input.value !== "") {
+                nextInput.removeAttribute("disabled");
+                nextInput.focus();
+            }
+
+            if (e.key === "Backspace" && prevInput) {
+                inputs.forEach((inp, idx) => {
+                    if (index1 <= idx) inp.value = "";
+                });
+                prevInput.focus();
+            }
+
+            if (Array.from(inputs).every(inp => inp.value)) {
+                button.classList.add("active");
+                button.removeAttribute("disabled");
+            } else {
+                button.classList.remove("active");
+                button.setAttribute("disabled", "disabled");
+            }
+        });
+    });
+</script> --}}
+
+
+<script>
+    const form = document.getElementById('otp-form');
+    const timerElement = document.getElementById('timer');
+    const resendButton = document.getElementById('resendButton');
+    const resendLink = document.getElementById('resendLink');
+    const timerText = document.querySelector('.text-primary.my-3');
+    const inputs = document.querySelectorAll(".otp-field > input");
+    const button = document.querySelector(".btn");
+
+    let countdown = 10;
+    let countdownInterval;
+
+    // Start initial countdown when page loads
+    startCountdown();
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const otp = Array.from(inputs).map(input => input.value).join('');
+        console.log(otp);
+
+        try {
+            const response = await fetch('/submit_otp', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ otp }),
+            });
+
+            const result = await response.json();
+            if (result.error) {
+                document.getElementById('otp-error').textContent = result.error;
+            } else {
+                window.location.href = '/login';
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    });
+
+    function startCountdown() {
+        countdown = 10;
+        timerElement.textContent = countdown;
+        timerText.style.display = 'block';
+        disableResendButton();
+
+        countdownInterval = setInterval(() => {
+            countdown--;
+            timerElement.textContent = countdown;
+            
+            if (countdown <= 0) {
+                clearInterval(countdownInterval);
+                timerElement.textContent = '';
+                timerText.style.display = 'none';
+                enableResendButton();
+            }
+        }, 1000);
+    }
+
+    function resendOTP() {
+        clearInterval(countdownInterval); // Clear any previous countdown
+        startCountdown(); // Restart countdown when Resend OTP is clicked
+    }
+
+    function disableResendButton() {
+        resendButton.disabled = true;
+        resendButton.classList.add('not-allowed');
+        resendLink.classList.add('not-allowed');
+        resendButton.style.cursor = 'not-allowed'; // Disable cursor on button
+        resendLink.style.cursor = 'not-allowed'; // Disable cursor on link
+        resendLink.style.pointerEvents = 'none';  // Prevent interaction with link
+    }
+
+    function enableResendButton() {
+        resendButton.disabled = false;
+        resendButton.classList.remove('not-allowed');
+        resendLink.classList.remove('not-allowed');
+        resendButton.style.cursor = 'pointer';  // Enable cursor on button
+        resendLink.style.cursor = 'pointer';  // Enable cursor on link
+        resendLink.style.pointerEvents = 'auto'; // Allow interaction with link
+    }
+
+    window.addEventListener("load", () => inputs[0].focus());
+    button.setAttribute("disabled", "disabled");
+
+    inputs.forEach((input, index1) => {
+        input.addEventListener("keyup", (e) => {
+            const nextInput = input.nextElementSibling;
+            const prevInput = input.previousElementSibling;
+
+            if (input.value.length > 1) input.value = input.value.charAt(0);
+
+            if (nextInput && input.value !== "") {
+                nextInput.removeAttribute("disabled");
+                nextInput.focus();
+            }
+
+            if (e.key === "Backspace" && prevInput) {
+                inputs.forEach((inp, idx) => {
+                    if (index1 <= idx) inp.value = "";
+                });
+                prevInput.focus();
+            }
+
+            if (Array.from(inputs).every(inp => inp.value)) {
+                button.classList.add("active");
+                button.removeAttribute("disabled");
+            } else {
+                button.classList.remove("active");
+                button.setAttribute("disabled", "disabled");
+            }
+        });
+    });
 </script>
+
