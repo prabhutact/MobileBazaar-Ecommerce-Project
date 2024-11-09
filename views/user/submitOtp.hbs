@@ -40,9 +40,14 @@
 
                     <div class="text-center">
                       <button type="submit" class="btn btn-fill-out btn-block hover-up">Submit</button>
+                      <br>
+                      <br>
                       <p class="text-primary my-3">Time left: <span id="timer">10</span> seconds</p>
-                      <button class="btn  hover-up" id="resendButton" onclick="resendOTP()"><a href="/resend_otp">Resend
-                          OTP</a></button>
+                      <button style="cursor: not-allowed;" class="btn hover-up" id="resendButton" onclick="resendOTP()">
+    <a style="cursor: not-allowed;" href="/resend_otp" id="resendLink">Resend OTP</a>
+</button>
+
+                          
 
                     </div>
                 </div>
@@ -103,6 +108,12 @@
 
 <script>
 
+      setTimeout(function() {
+        // Change cursor to pointer after 10 seconds
+        document.getElementById('resendButton').style.cursor = 'pointer';
+        document.getElementById('resendLink').style.cursor = 'pointer';
+    }, 11000); // 10000 ms = 10 seconds
+
   const form = document.getElementById('otp-form');
 
   form.addEventListener('submit', async (e) => {
@@ -147,8 +158,8 @@
   function updateTimer() {
     timerElement.textContent = countdown;
     countdown--;
-    resendButton.disabled = true;
-    resendButton.classList.add('not-allowed');
+    //resendButton.disabled = true;
+    //resendButton.classList.add('not-allowed');
     if (countdown < 0) {
       clearInterval(countdownInterval);
       timerElement.textContent = '';

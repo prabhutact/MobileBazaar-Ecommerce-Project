@@ -1,0 +1,400 @@
+<main class="main">
+    <div class="page-header breadcrumb-wrap">
+        <div class="container">
+            <div class="breadcrumb">
+                <a href="index.html" rel="nofollow">Home</a>
+                <span></span> Pages
+                <span></span> Account
+            </div>
+        </div>
+    </div>
+    <section class="pt-50 pb-150">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 m-auto">
+                    <div class="row">
+                        {{> profileHeader}}
+                        
+                        <div class="col-md-9">
+                            <section class="content-body p-xl-4">
+                                <div class="content-header">
+                                    <div>
+                                        <h2 class="content-title card-title">Order detail</h2>
+                                        <p>Details for Order ID: {{myOrderDetails._id}}</p>
+                                    </div>
+                                </div>
+                                <div class="card">
+                                    <header class="card-header">
+                                        <div class="row align-items-center">
+                                            <div class="col-lg-6 col-md-6 mb-lg-0 mb-15">
+                                                <span>
+                                                    <i class="material-icons md-calendar_today"></i>
+                                                    <b>{{myOrderDetails.date}}</b>
+                                                </span> <br>
+                                                <small class="text-muted">Order ID: {{myOrderDetails._id}}</small>
+                                            </div>
+                                            <div class="col-lg-6 col-md-6 ms-auto text-md-end">
+                                                <a onclick="getInvoice('{{myOrderDetails._id}}')"
+                                                    class="btn btn-secondary print ms-2" href="#"><i
+                                                        class="fa fa-print" style="font-size: 1rem;"></i></a>
+                                            </div>
+                                        </div>
+                                    </header>
+                                    <div class="card-body">
+                                        <div class="row mb-50 mt-20 order-info-wrap">
+                                            <div class="col-md-4">
+                                                <article class="icontext align-items-start">
+                                                    <span class="icon icon-sm rounded-circle bg-primary-light">
+                                                        <i class="text-primary material-icons md-person"></i>
+                                                    </span>
+                                                    <div class="text">
+                                                        <h6 class="mb-1">Customer</h6>
+                                                        <p class="mb-1">
+                                                            {{address.name}} <br> {{address.mobile}}
+                                                        </p>
+                                                    </div>
+                                                </article>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <article class="icontext align-items-start">
+                                                    <span class="icon icon-sm rounded-circle bg-primary-light">
+                                                        <i class="text-primary material-icons md-local_shipping"></i>
+                                                    </span>
+                                                    <div class="text">
+                                                        <h6 class="mb-1">Order info</h6>
+                                                        <p class="mb-1">
+                                                            Shipping: Fargo express <br> Pay method:
+                                                            {{myOrderDetails.paymentMethod}} <br> Status:
+                                                            {{myOrderDetails.status}}
+                                                        </p>
+                                                    </div>
+                                                </article>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <article class="icontext align-items-start">
+                                                    <span class="icon icon-sm rounded-circle bg-primary-light">
+                                                        <i class="text-primary material-icons md-place"></i>
+                                                    </span>
+                                                    <div class="text">
+                                                        <h6 class="mb-1">Deliver to</h6>
+                                                        <p class="mb-1">
+                                                            City: {{address.city}}, {{address.state}}
+                                                            <br>{{address.addressLine1}} <br>{{address.addressLine2}}
+                                                            <br>Pin: {{address.pin}}
+                                                        </p>
+                                                    </div>
+                                                </article>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-lg-7">
+                                                <div class="table-responsive">
+                                                    <table class="table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th width="40%">Product</th>
+                                                                <th width="20%">Unit Price</th>
+                                                                <th width="20%">Quantity</th>
+                                                                <th width="20%">Total</th>
+                                                                <th width="20%" class="text-end">Cancel</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            {{#each orderedProDet}}
+                                                            <tr>
+                                                                <td>
+                                                                    <a class="itemside" href="#">
+                                                                        <div class="left">
+                                                                            <img src="/assets/imgs/products/{{this.product.image}}"
+                                                                                width="40" height="40" class="img-xs"
+                                                                                alt="Item">
+                                                                        </div>
+                                                                        <div class="info">{{this.product.name}}</div>
+                                                                    </a>
+                                                                </td>
+                                                                <td> ₹{{this.product.price}} </td>
+                                                                <td>{{this.product.quantity}} </td>
+                                                                <td>₹{{multiply this.product.quantity
+                                                                    this.product.price }}</td>
+
+                                                                <td class="text-end">
+                                                                    {{!-- {{#singlestatuchecker ../myOrderDetails.product}}
+                                                                    {{#if this.product.isReturned}}
+                                                                    <span
+                                                                        class="badge rounded-pill alert-info text-info">Returned</span>
+                                                                    {{else}}
+                                                                    <button id="returnnow-btn"
+                                                                        class="btn btn-primary btn-sm return-btn"
+                                                                        data-order-id="{{../myOrderDetails._id}}"
+                                                                        data-prod-id="{{this.product._id}}">Return</button>
+                                                                    {{/if}}
+                                                                    {{else}}
+                                                                    {{#if this.product.isCancelled}}
+                                                                    <span
+                                                                        class="badge rounded-pill alert-danger text-danger">Cancelled</span>
+                                                                    {{else}}
+                                                                    <button id="cancel-btn"
+                                                                        class="btn btn-primary btn-sm cancel-btn"
+                                                                        data-order-id="{{../myOrderDetails._id}}"
+                                                                        data-prod-id="{{this.product._id}}">Cancel</button>
+                                                                    {{/if}} 
+                                                                   
+                                                                    
+                                                                    {{/singlestatuchecker}} --}}
+                                                                    {{#singlestatuchecker this.product}}
+                                                                        {{#ifCond ../myOrderDetails.status '==' 'Delivered'}}
+                                                                            <button id="returnnow-btn" class="btn btn-primary btn-sm return-btn" data-order-id="{{../myOrderDetails._id}}" data-prod-id="{{this.product._id}}">Return</button>
+                                                                        {{else}}
+                                                                            <button id="cancel-btn" class="btn btn-primary btn-sm cancel-btn" data-order-id="{{../myOrderDetails._id}}" data-prod-id="{{this.product._id}}">Cancel</button>
+                                                                        {{/ifCond}}
+                                                                    {{/singlestatuchecker}}
+                                                                </td>
+                                                            </tr>
+                                                            {{/each}}
+                                                            <tr>
+                                                                <td colspan="5">
+                                                                    <article class="float-end">
+                                                                        <dl class="dlist">
+                                                                            <dt>Delivery:</dt>
+                                                                            <dd>
+                                                                                <span class="text-danger">+₹
+                                                                                    50</span>
+                                                                            </dd>
+                                                                        </dl>
+                                                                        <dl class="dlist">
+                                                                            <dt>Discount:</dt>
+                                                                            <dd>{{#if myOrderDetails.couponUsed}}
+                                                                                <span class="text-success">-₹
+                                                                                    {{myOrderDetails.discountAmt}}</span>
+                                                                                    {{else}}
+                                                                                    <span class="text-success">-₹ 0</span>
+                                                                                    {{/if}}
+                                                                            </dd>
+                                                                        </dl>
+                                                                        <dl class="dlist">
+                                                                            <dt>Grand Total:</dt>
+                                                                            {{#if myOrderDetails.couponUsed}}
+                                                                            <dd>
+                                                                                <b
+                                                                                    class="h5">₹{{ myOrderDetails.amountAfterDscnt }}</b>
+                                                                            </dd>
+                                                                            {{else}}
+                                                                            <dd>
+                                                                                <b
+                                                                                    class="h5">₹{{add myOrderDetails.total 0}}</b>
+                                                                            </dd>
+
+                                                                            {{/if}}
+                                                                        </dl>
+                                                                        
+                                                                        {{#statuchecker myOrderDetails}}
+                                                                        {{else}}
+
+                                                                        {{/statuchecker}}
+                                                                    </article>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-5">
+                                                <div class="box shadow-sm bg-light">
+                                                    <!-- Optional: any other information you want to show -->
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+    const getInvoice = async (id) => {
+  try {
+    const response = await fetch(`/get_invoice?id=${id}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/pdf'
+      }
+    });
+
+    // Check if the response is successful
+    if (!response.ok) {
+      throw new Error('Failed to fetch invoice');
+    }
+
+    // Get the blob data from the response
+    const blob = await response.blob();
+
+    // Create a URL for the downloaded file
+    const url = URL.createObjectURL(blob);
+
+    // Create a link element to trigger the download
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'invoice.pdf';
+
+    // Trigger the download
+    link.click();
+
+    // Clean up the URL object
+    URL.revokeObjectURL(url);
+  } catch (error) {
+    console.error('Error fetching invoice:', error);
+    // Handle the error, e.g., display an error message to the user
+  }
+};
+    $(document).ready(function () {
+        function areAllProductsCancelled() {
+            let allCancelled = true;
+            $('.product-row').each(function () {
+                if (!$(this).data('is-cancelled')) {
+                    allCancelled = false;
+                    return false; // Exit the loop early if any product is not cancelled
+                }
+            });
+            return allCancelled;
+        }
+
+        // Event listener for canceling individual products
+        $('body').on('click', '.cancel-btn', function () {
+            const orderId = $(this).data('order-id');
+            const productId = $(this).data('prod-id');
+
+            if (orderId && productId) {
+                $.ajax({
+                    type: 'PUT',
+                    url: '/cancel-one-product',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ id: orderId, prodId: productId }),
+                    success: function (response) {
+                        if (response.success) {
+                             Swal.fire({
+                            icon: 'success',
+                            title: 'Cancelled product',
+                            text: response.message,
+                            showConfirmButton: false,
+                            timer: 1500
+                        }).then(()=>{window.location.reload();})
+                        }
+                    },
+                    error: function (error) {
+                        console.error('Error:', error);
+                        alert('An error occurred. Please try again.');
+                    }
+                });
+            } else {
+                alert('Invalid order or product ID.');
+            }
+        });
+
+        // Event listener for canceling the entire order
+        $('#cancelOrder').on('click', function () {
+            const orderId = $(this).data('order-id');
+
+            if (orderId) {
+                $.ajax({
+                    type: 'PUT',
+                    url: `/cancel-order/${orderId}`,
+                    contentType: 'application/json',
+                    success: function (response) {
+                        if (response.success) {
+                             Swal.fire({
+                            icon: 'success',
+                            title: 'Cancelled Order',
+                            text: response.message,
+                            showConfirmButton: false,
+                            timer: 1500
+                        }).then(()=>{window.location.reload();})
+                        } else {
+                            alert(response.message);
+                        }
+                    },
+                    error: function (error) {
+                        console.error('Error:', error);
+                        alert('An error occurred. Please try again.');
+                    }
+                });
+            } else {
+                alert('Invalid order ID.');
+            }
+        });
+        // Event listener for returning individual products
+        $('body').on('click', '.return-btn', function () {
+            const orderId = $(this).data('order-id');
+            const productId = $(this).data('prod-id');
+
+            if (orderId && productId) {
+                $.ajax({
+                    type: 'PUT',
+                    url: '/return-one-product',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ id: orderId, prodId: productId }),
+                    success: function (response) {
+                        if (response.success) {
+                            Swal.fire({
+                            icon: 'success',
+                            title: 'Returned product',
+                            text: response.message,
+                            showConfirmButton: false,
+                            timer: 1500
+                        }).then(()=>{window.location.reload();})
+                        }
+                    },
+                    error: function (error) {
+                        console.error('Error:', error);
+                        alert('An error occurred. Please try again.');
+                    }
+                });
+            } else {
+                alert('Invalid order or product ID.');
+            }
+        });
+
+        // Event listener for return the entire order
+        $('#returnOrder').on('click', function () {
+            const orderId = $(this).data('order-id');
+
+            if (orderId) {
+                $.ajax({
+                    type: 'PUT',
+                    url: `/return-order/${orderId}`,
+                    contentType: 'application/json',
+                    success: function (response) {
+                        if (response.success) {
+                             Swal.fire({
+                            icon: 'success',
+                            title: 'Returned Order',
+                            text: response.message,
+                            showConfirmButton: false,
+                            timer: 1500
+                        }).then(()=>{window.location.reload();})
+                        } else {
+                            alert(response.message);
+                        }
+                    },
+                    error: function (error) {
+                        console.error('Error:', error);
+                        alert('An error occurred. Please try again.');
+                    }
+                });
+            } else {
+                alert('Invalid order ID.');
+            }
+        });
+
+        // Check if all products are cancelled after page load
+        //if (areAllProductsCancelled()) {
+        //     $('#cancelOrder').replaceWith('<span class="badge rounded-pill alert-danger text-danger">Order Cancelled</span>');
+        // }
+    });
+</script>

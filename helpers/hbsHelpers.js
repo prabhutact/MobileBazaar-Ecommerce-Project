@@ -72,6 +72,38 @@ function isCancelled(Handlebars) {
   });
 }
 
+function singleIsCancelled(Handlebars) {
+  Handlebars.registerHelper('singlestatuchecker', function (product, options) {
+      if (product.isReturned) {
+          return new Handlebars.SafeString('<span class="badge rounded-pill alert-info text-info">Returned</span>');
+      } else if (product.isCancelled) {
+          return new Handlebars.SafeString('<span class="badge rounded-pill alert-danger text-danger">Cancelled</span>');
+      } else {
+          return options.fn(this);
+      }
+  });
+}
+
+
+function statushelper(Handlebars){
+  Handlebars.registerHelper('ifeq', function (a, b, options) {
+      if (a == b) { return options.fn(this); }
+      return options.inverse(this);
+    });
+}
+
+function length(Handlebars) {
+
+  Handlebars.registerHelper('length', function (value,options) {
+      if (value && value.length>0){
+          return options.fn(this)
+      } 
+      else {
+          return options.inverse(this)
+      }
+  });
+}
+
 
 function formatDate(Handlebars) {
 
@@ -83,7 +115,35 @@ function formatDate(Handlebars) {
   });
 }
 
-
+function ifCondition(Handlebars){
+  Handlebars.registerHelper('ifCond', function (v1, operator, v2, options) {
+      switch (operator) {
+          case '==':
+              return (v1 == v2) ? options.fn(this) : options.inverse(this);
+          case '===':
+              return (v1 === v2) ? options.fn(this) : options.inverse(this);
+          case '!=':
+              return (v1 != v2) ? options.fn(this) : options.inverse(this);
+          case '!==':
+              return (v1 !== v2) ? options.fn(this) : options.inverse(this);
+          case '<':
+              return (v1 < v2) ? options.fn(this) : options.inverse(this);
+          case '<=':
+              return (v1 <= v2) ? options.fn(this) : options.inverse(this);
+          case '>':
+              return (v1 > v2) ? options.fn(this) : options.inverse(this);
+          case '>=':
+              return (v1 >= v2) ? options.fn(this) : options.inverse(this);
+          case '&&':
+              return (v1 && v2) ? options.fn(this) : options.inverse(this);
+          case '||':
+              return (v1 || v2) ? options.fn(this) : options.inverse(this);
+          default:
+              return options.inverse(this);
+      }
+  });
+  
+} 
 
 module.exports = {
   incHelper,
@@ -92,5 +152,9 @@ module.exports = {
   addHelper,
   isCancelled,
   formatDate,
-  isequal
+  isequal,
+  length,
+  statushelper,
+  ifCondition,
+  singleIsCancelled
 }

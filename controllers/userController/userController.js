@@ -297,65 +297,7 @@ const productDetails = async (req, res) => {
   } catch (error) {}
 };
 
-const my_Orders = async (req, res) => {
-  try {
-    const user = req.session.user;
-    const id = user._id;
-    const userData = await User.findById(id).lean();
-    // const userDataObject = userData.toObject();
-    var page = 1;
-    if (req.query.page) {
-      page = req.query.page;
-    }
-    let limit = 5;
-    const skip = (page - 1) * limit;
 
-    console.log(userData, "userdata");
-
-    const myOrders = await Order.aggregate([
-      {
-        $match: {
-          userId: new mongoose.Types.ObjectId(id),
-        },
-      },
-      {
-        $project: {
-          _id: 1,
-          date: 1,
-          orderId: 1,
-          status: 1,
-          amountAfterDscnt: 1,
-          total: 1,
-        },
-      },
-      {
-        $sort: {
-          date: -1,
-        },
-      },
-      {
-        $skip: skip,
-      },
-      {
-        $limit: limit,
-      },
-    ]);
-    const count = await Order.find({}).countDocuments();
-    const totalPages = Math.ceil(count / limit);
-    const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
-
-    console.log(myOrders, "myOrders");
-    res.render("user/myOrders", {
-      userData: userData,
-      myOrders,
-      pages,
-      currentPage: page,
-    });
-  } catch (error) {
-    console.log(error.message);
-    res.status(500).send("Internal Server Error");
-  }
-};
 
 module.exports = {
   getHome,
@@ -369,5 +311,5 @@ module.exports = {
   doLogout,
   googleCallback,
   productDetails,
-  my_Orders,
+ 
 };
