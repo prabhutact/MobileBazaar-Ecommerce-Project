@@ -133,7 +133,7 @@
 
         var name = document.getElementById('productName').value;
         var nameError = document.getElementById('nameError');
-        var categoryPattern = /^[a-zA-Z]{3,}$/;
+        var categoryPattern = /^[a-zA-Z]{4,}(?: [a-zA-Z]+)*$/;
 
         // Validate Category Name
         if (!name.match(categoryPattern)) {

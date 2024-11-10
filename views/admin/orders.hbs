@@ -64,8 +64,9 @@
                                                 <select name="status" class="form-select"
                                                     aria-label="Default select example">
                                                     <option selected disabled hidden>Change order status</option>
-                                                    <option value="Shipped">Shipped</option>
-                                                    <option value="Delivered">Delivered</option>
+                                                    <option value="Shipped" {{#ifCond this.status '==' 'Shipped'}}disabled{{/ifCond}} 
+                                                    {{#ifCond this.status '==' 'Delivered'}}disabled{{/ifCond}}>Shipped</option>
+                                                    <option value="Delivered" {{#ifCond this.status '==' 'Delivered'}}disabled{{/ifCond}}>Delivered</option>
                                                 </select>
                                             </div>
                                             <div>

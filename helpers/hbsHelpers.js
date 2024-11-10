@@ -35,6 +35,18 @@ function isequal(Handlebars) {
   });
 }
 
+function ifCondition1(Handlebars){
+    Handlebars.registerHelper('ifCond', function(v1, operator, v2, options) {
+        switch (operator) {
+            case '==':
+                return (v1 == v2) ? options.fn(this) : options.inverse(this);
+            default:
+                return options.inverse(this);
+        }
+    });
+}
+
+
 function isCancelled(Handlebars) {
   Handlebars.registerHelper('statuchecker',  function (value) {
       let ct=0
@@ -153,6 +165,7 @@ module.exports = {
   isCancelled,
   formatDate,
   isequal,
+  ifCondition1,
   length,
   statushelper,
   ifCondition,
