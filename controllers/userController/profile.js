@@ -6,6 +6,7 @@ const userHelper = require("../../helpers/user.helper");
 const Cart = require("../../model/cartModel");
 const Wishlist = require('../../model/wishlistSchema')
 const Order = require("../../model/orderModel");
+const argon2 = require("argon2");
 
 const mongoose = require("mongoose");
 //const ObjectId = require('mongoose')
@@ -90,11 +91,11 @@ const updatePassword = async (req, res) => {
     const { oldPass, newPass } = req.body;
     const userId = req.session.user;
     const findUser = await User.findOne({ _id: userId }).lean();
-    const passwordMatch = await userHelper.hashPassword(oldPass);
+    const passwordMatch = await argon2.verify(findUser.password, oldPass);
 
     if (passwordMatch) {
-      const saltRounds = 10;
-      const hashedPassword = await userHelper.hashPassword(newPass);
+      //const saltRounds = 10;
+      const hashedPassword = await argon2.hash(newPass)
       console.log("Hashed Password:", hashedPassword);
       await User.updateOne(
         { _id: userId },

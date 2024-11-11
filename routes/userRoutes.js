@@ -5,7 +5,7 @@ const { getHome, getLogin, getSignup, doSignup, getOtp, submitOtp, resendOtp, do
 const { submitMail, submitMailPost, forgotOtppage, forgotOtpSubmit, resetPasswordPage, resetPassword } = require('../controllers/userController/forgotPassword')
 const { viewUserProfile, EditUserProfile, updateUserProfile, changePassword, updatePassword, my_Orders, orderDetails, verify, walletpage } = require('../controllers/userController/profile')
 const { addAddress, addAddressPost, manageAddress, editAddress, editAddressPost, deleteAddress } = require('../controllers/userController/addressManagement')
-const { loadCartPage, addToCart, removeFromCart, updateCart } = require('../controllers/userController/cart')
+const { loadCartPage, addToCart, removeFromCart, updateCart, checkOutOfStock } = require('../controllers/userController/cart')
 const { loadCheckoutPage, placeorder, orderSuccess, validateCoupon, applyCoupon, removeCoupon } = require('../controllers/userController/checkoutManagement')
 const { getProduct, searchAndSort } = require('../controllers/userController/shopManagement')
 const { showWishlistPage, addToWishList, removeFromWishList } = require('../controllers/userController/wishlistManagement')
@@ -95,6 +95,7 @@ router.get('/cart', logedin, isBlocked, loadCartPage)
 router.post('/addtocart/:id', logedin, isBlocked, addToCart)
 router.post('/removeFromCart', logedin, isBlocked, removeFromCart)
 router.post('/updatecart', updateCart)
+router.post('/checkOutOfStock', checkOutOfStock);
 
 
 //wallet

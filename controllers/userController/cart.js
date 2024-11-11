@@ -31,10 +31,18 @@ const loadCartPage = async (req, res) => {
           productPrice: { $arrayElemAt: ["$productData.price", 0] },
           productDescription: { $arrayElemAt: ["$productData.description", 0] },
           productImage: { $arrayElemAt: ["$productData.imageUrl", 0] },
+          stock: { $arrayElemAt: ["$productData.stock", 0] }
         },
       },
     ]);
     console.log(cartProd);
+
+    cartProd = cartProd.map(item => {
+      if (item.stock <= 0) {
+        item.outOfStock = true; // Add outOfStock flag if product is out of stock
+      }
+      return item;
+    });
 
     const subTotal = await Cart.aggregate([
       {
@@ -241,11 +249,18 @@ const updateCart = async (req, res) => {
     updatedCart.forEach((data) => {
       const newDataItem = { ...data };
 
-      if (data.totalAmount) {
-        newDataItem.totalAmount = newValue;
-      } else {
-        newDataItem.totalAmount = newValue;
-      }
+      // if (data.totalAmount) {
+      //   newDataItem.totalAmount = newValue;
+      // } else {
+      //   newDataItem.totalAmount = newValue;
+      // }
+      if (data.stock <= 0) {
+    newDataItem.totalAmount = "Out of Stock";  // Set totalAmount to a string if out of stock
+    newDataItem.outOfStock = true; // Mark the product as out of stock
+  } else {
+    // Calculate the total amount if the product is in stock
+    newDataItem.totalAmount = newValue;
+  }
 
       newData.push(newDataItem);
     });
@@ -267,9 +282,49 @@ const updateCart = async (req, res) => {
   }
 };
 
+
+
+
+const checkOutOfStock = async (req, res) => {
+  try {
+    const userData = req.session.user;
+    const cartItems = await Cart.find({ userId: userData._id }).lean(); 
+
+    if (cartItems.length === 0) {
+      return res.json({ success: false, message: "Your cart is empty." });
+    }
+
+    let outOfStockProducts = [];
+
+    for (let item of cartItems) {
+      const product = await Product.findById(item.product_Id).lean();
+      if (product.stock <= 0) {        
+        outOfStockProducts.push(product.name);
+      }
+    }
+
+    if (outOfStockProducts.length > 0) {      
+      return res.json({
+        success: false,
+        message: `The following products are out of stock: ${outOfStockProducts.join(", ")}. Please remove them from your cart to proceed.`,
+      });
+    }
+    
+    res.json({
+      success: true,
+      message: "All products are in stock. You can proceed to checkout.",
+    });
+
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).send("Internal Server Error");
+  }
+};
+
 module.exports = {
   loadCartPage,
   addToCart,
   removeFromCart,
   updateCart,
+  checkOutOfStock
 };

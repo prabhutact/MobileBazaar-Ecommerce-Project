@@ -126,17 +126,17 @@
                                     <aside class="col-lg-4">
                                         <figure class="text-lg-center">
                                             <label for="fileInput">
-                                                <img class="img-lg mb-3 img-avatar"  src="/images/users/{{userData.image.[0]}}" alt="user image"  onerror="src='/assetsAdmin/imgs/people/avatar1.png'"
+                                                <img class="img-lg mb-3 img-avatar"  src="/images/users/{{userData.image.[0]}}" alt="user image"  onerror="src='/images/users/UserImage.png'"
                                                     alt="User Photo" id="userPhoto" style="margin-top: -20px; display: block; margin-left: auto; margin-right: auto;">
                                                 <input type="file" id="fileInput"
                                                     class="img-lg mb-3 img-avatar visually-hidden" accept="image/*"
                                                     onchange="previewImage(this)" name="image">
-                                                <figcaption>
+                                                {{!-- <figcaption>
                                                     <a class="btn btn-light rounded font-md" href="#"
                                                         onclick="document.getElementById('fileInput').click(); return false;">
                                                         <i class="icons material-icons md-backup font-md"></i> Upload
                                                     </a>
-                                                </figcaption>
+                                                </figcaption> --}}
                                             </label>
                                         </figure>
                                     </aside> <!-- col.// -->

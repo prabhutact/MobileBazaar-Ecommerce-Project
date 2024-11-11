@@ -34,6 +34,9 @@
                                         </h5>
                                         {{!-- <p class="font-xs">{{productDescription}}
                                         </p> --}}
+                                        {{#if outOfStock}}
+                                        <p class="font-xs text-danger">Out of Stock</p>
+                                        {{/if}}
                                     </td>
                                     <td class="price" data-title="Price"><span>₹{{productPrice}} </span></td>
 
@@ -101,8 +104,11 @@
                                         </tbody>
                                     </table>
                                 </div>
-                                <a href="/cart/checkout" class="btn "> <i class="fi-rs-box-alt mr-10"></i> Proceed To
-                                    CheckOut</a>
+                                {{!-- <a href="/cart/checkout" class="btn "> <i class="fi-rs-box-alt mr-10"></i> Proceed To
+                                    CheckOut</a> --}}
+                                    <a href="javascript:void(0)" class="btn" id="proceedToCheckoutBtn">
+                                    <i class="fi-rs-box-alt mr-10"></i> Proceed To Checkout
+                                    </a>
                             </div>
                         </div>
                     </div>
@@ -240,7 +246,36 @@
         updateCartTotal();
     
 
-
+$('#proceedToCheckoutBtn').on('click', function() {
+    $.ajax({
+        url: '/checkOutOfStock',
+        method: 'POST',
+        contentType: 'application/json',
+        success: function(data) {
+            console.log("Response from server:", data);
+            
+            if (!data.success) {
+                // If out of stock, show the message in SweetAlert
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: data.message,
+                });
+            } else {
+                // If all products are in stock, redirect to checkout page
+                window.location.href = "/cart/checkout";
+            }
+        },
+        error: function(error) {
+            console.log("Error:", error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Something went wrong, please try again.',
+            });
+        }
+    });
+});
 
 
 </script>
