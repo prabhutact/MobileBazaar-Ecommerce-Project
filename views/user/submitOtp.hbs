@@ -43,8 +43,8 @@
                       <br>
                       <br>
                       <p class="text-primary my-3">Time left: <span id="timer">10</span> seconds</p>
-                      <button style="cursor: not-allowed;" class="btn hover-up" id="resendButton" onclick="resendOTP()">
-    <a style="cursor: not-allowed;" href="/resend_otp" id="resendLink">Resend OTP</a>
+                      <button type="button" id="resendButton" class="btn hover-up" style="cursor: not-allowed;" onclick="resendOTP()">
+                        <a href="#" style="cursor: not-allowed;" id="resendLink">Resend OTP</a>
 </button>
 
 
@@ -361,7 +361,7 @@
 </script> --}}
 
 
-<script>
+{{!-- <script>
     const form = document.getElementById('otp-form');
     const timerElement = document.getElementById('timer');
     const resendButton = document.getElementById('resendButton');
@@ -473,5 +473,125 @@
             }
         });
     });
-</script>
+</script> --}}
 
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+  const form = document.getElementById('otp-form');
+  const timerElement = document.getElementById('timer');
+  const resendButton = document.getElementById('resendButton');
+  const resendLink = document.getElementById('resendLink');
+  const timerText = document.querySelector('.text-primary.my-3');
+  const inputs = document.querySelectorAll(".otp-field > input");
+  const submitButton = document.querySelector(".btn");
+
+  let countdown = 10;
+  let countdownInterval;
+
+  // Start countdown when the page loads
+  startCountdown();
+
+  // Form submission event
+  form.addEventListener('submit', async function (e) {
+    e.preventDefault(); // Prevent default form submission
+
+    const otp = Array.from(inputs).map(input => input.value).join('');
+    console.log('OTP submitted:', otp);
+
+    try {
+      const response = await fetch('/submit_otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ otp }),
+      });
+
+      const result = await response.json();
+      if (result.error) {
+        document.getElementById('otp-error').textContent = result.error;
+      } else {
+        window.location.href = '/login';
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  });
+
+  // Countdown function
+  function startCountdown() {
+    countdown = 10;
+    timerElement.textContent = countdown;
+    timerText.style.display = 'block';
+    disableResendButton(); // Disable the resend button
+
+    countdownInterval = setInterval(function () {
+      countdown--;
+      timerElement.textContent = countdown;
+
+      if (countdown <= 0) {
+        clearInterval(countdownInterval);
+        timerElement.textContent = '';
+        timerText.style.display = 'none';
+        enableResendButton(); // Enable resend button
+      }
+    }, 1000);
+  }
+
+  // Resend OTP
+  function resendOTP() {
+    console.log('Resend OTP clicked');
+    clearInterval(countdownInterval); // Clear previous countdown
+    startCountdown(); // Restart the countdown
+  }
+
+  // Disable the resend button
+  function disableResendButton() {
+    resendButton.disabled = true;
+    resendButton.style.cursor = 'not-allowed';
+    resendLink.style.cursor = 'not-allowed';
+    resendLink.style.pointerEvents = 'none'; // Disable click on the link
+  }
+
+  // Enable the resend button
+  function enableResendButton() {
+    resendButton.disabled = false;
+    resendButton.style.cursor = 'pointer';
+    resendLink.style.cursor = 'pointer';
+    resendLink.style.pointerEvents = 'auto'; // Allow click on the link
+  }
+
+  // Input field behavior: focus on next input automatically
+  inputs.forEach((input, index) => {
+    input.addEventListener('keyup', function (e) {
+      if (input.value.length > 1) input.value = input.value.charAt(0); // Allow only one character
+
+      const nextInput = input.nextElementSibling;
+      const prevInput = input.previousElementSibling;
+
+      // Move focus to the next input
+      if (nextInput && input.value !== "") {
+        nextInput.removeAttribute('disabled');
+        nextInput.focus();
+      }
+
+      // Move focus back to the previous input if backspace is pressed
+      if (e.key === 'Backspace' && prevInput) {
+        prevInput.focus();
+        prevInput.value = ''; // Clear value
+      }
+
+      // Enable submit button when all inputs are filled
+      if (Array.from(inputs).every(input => input.value)) {
+        submitButton.removeAttribute('disabled');
+        submitButton.classList.add('active');
+      } else {
+        submitButton.setAttribute('disabled', 'disabled');
+        submitButton.classList.remove('active');
+      }
+    });
+  });
+
+  // Focus on the first input on load
+  window.addEventListener('load', () => inputs[0].focus());
+});
+
+</script>

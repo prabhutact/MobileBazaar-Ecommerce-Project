@@ -1,11 +1,12 @@
 const express = require('express')
 const router = express.Router()
-const { getLogin, getHome, doLogin, doLogout } = require("../controllers/adminController/adminController")
+const { getLogin, doLogin, doLogout } = require("../controllers/adminController/adminController")
 const { showProduct, addProductPage, addProduct, blockProduct, showeditProduct, updateProduct, deleteProdImage } = require('../controllers/adminController/productManagement');
 const { addCategoryPage, addNewCategory, showCategoryPage, unListCategory, showEditCategory, updateCategory } = require('../controllers/adminController/categoryManagement');
 const { usersPage, blockUser } = require('../controllers/adminController/UserManagement');
 const { ordersPage, orderDetails, changeStatus } = require('../controllers/adminController/ordersManagement');
 const { couponPage, addCouponPage, addCouponPost, editCouponPage, editCouponPost, deleteCoupon } = require('../controllers/adminController/couponManagement');
+const {  loadDashboard, getSales, getChartData }=require('../controllers/adminController/dashBoardManagement')
 const { isLogin, isLogout } = require("../middleware/adminAuth")
 const store = require('../middleware/multer')
 
@@ -14,7 +15,9 @@ const store = require('../middleware/multer')
 router.get("/admin/login", isLogout , getLogin)
 router.post("/admin/login" , isLogout, doLogin)
 router.get("/admin/logout",  doLogout)
-router.get("/admin/home",isLogin , getHome)
+
+router.get('/admin/home', isLogin, loadDashboard)
+//router.get("/admin/home",isLogin , getHome)
 
 // Product Page
 
@@ -57,6 +60,10 @@ router.post('/admin/add_coupon', isLogin, addCouponPost)
 router.get('/admin/editcoupon/:id', editCouponPage);
 router.post('/admin/editcoupon/:id', editCouponPost);
 router.delete('/admin/delete_coupon',isLogin,deleteCoupon)
+
+// Chart
+router.get('/get_sales',isLogin, getSales)
+router.get('/get_chart_data',isLogin, getChartData)
 
 
 
