@@ -70,7 +70,12 @@ function isCancelled(Handlebars) {
           `);
       } else if (value.status == "Returned") {
           return new Handlebars.SafeString('<span class="badge rounded-pill alert-info text-info">Order Returned</span>');
-      } else {
+      } else if (value.status === "Payment Failed") {       
+        return new Handlebars.SafeString(`
+          <button id="retryPayment" data-order-id="${value._id}" class="btn btn-sm btn-warning">Retry Payment</button>
+        `);
+      } 
+      else {
           if (allCancelled || value.status === 'Cancelled') {
               return new Handlebars.SafeString('<span class="badge rounded-pill alert-danger text-danger">Order Cancelled</span>');
           } else if (ct>0 ) {

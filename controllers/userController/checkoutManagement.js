@@ -79,6 +79,204 @@ const loadCheckoutPage = async (req, res) => {
   }
 };
 
+// const placeorder = async (req, res) => {
+//   try {
+//     console.log("place order ");
+//     userData = req.session.user;
+//     const ID = new mongoose.Types.ObjectId(userData._id);
+//     const addressId = req.body.selectedAddress;
+//     const payMethod = req.body.selectedPayment;
+//     const totalamount = req.body.amount;
+//     console.log("Request dot body  ", addressId, payMethod, totalamount);
+
+//     const result = Math.random().toString(36).substring(2, 7);
+//     const id = Math.floor(100000 + Math.random() * 900000);
+//     const ordeId = result + id;
+
+//     const productInCart = await Cart.aggregate([
+//       {
+//         $match: {
+//           userId: ID,
+//         },
+//       },
+
+//       {
+//         $lookup: {
+//           from: "products",
+//           foreignField: "_id",
+//           localField: "product_Id",
+//           as: "productData",
+//         },
+//       },
+//       {
+//         $project: {
+//           product_Id: 1,
+//           userId: 1,
+//           quantity: 1,
+//           value: 1,
+//           name: { $arrayElemAt: ["$productData.name", 0] },
+//           price: { $arrayElemAt: ["$productData.price", 0] },
+//           productDescription: { $arrayElemAt: ["$productData.description", 0] },
+//           image: { $arrayElemAt: ["$productData.imageUrl", 0] },
+//         },
+//       },
+//     ]);
+//     console.log(productInCart);
+
+//     let productDet = productInCart.map((item) => {
+//       return {
+//         _id: item.product_Id,
+//         name: item.name,
+//         price: item.price,
+//         quantity: item.quantity,
+//         image: item.image[0],
+//       };
+//     });
+
+//     console.log(productDet, "aggregated cart prods");
+
+//     let saveOrder = async () => {
+//       if (req.body.couponData) {
+//         const order = new Order({
+//           userId: ID,
+//           product: productDet,
+//           address: addressId,
+//           orderId: ordeId,
+//           total: totalamount + 50,
+//           paymentMethod: payMethod,
+//           discountAmt: req.body.couponData.discountAmt,
+//           amountAfterDscnt: req.body.couponData.newTotal + 50,
+//           coupon: req.body.couponName,
+//           couponUsed: true,
+//         });
+
+//         const ordered = await order.save();
+//         console.log(ordered, "ordersaved DATAAAA with coupon");
+//       } else {
+//         const order = new Order({
+//           userId: ID,
+//           product: productDet,
+//           address: addressId,
+//           orderId: ordeId,
+//           total: totalamount + 50,
+//           paymentMethod: payMethod,
+//         });
+
+//         const ordered = await order.save();
+//         console.log(ordered, "ordersaved DATAAAA");
+//       }
+
+//       productDet.forEach(async (product) => {
+//         await Product.updateMany(
+//           { _id: product._id },
+//           { $inc: { stock: -product.quantity } }
+//         );
+//       });
+
+//       const deletedCart = await Cart.deleteMany({
+//         userId: ID,
+//       }).lean();
+
+//       console.log(deletedCart, "deletedCart");
+
+
+//     };
+
+//     console.log(addressId);
+
+//     if (addressId) {
+//       if (payMethod === "cash-on-delivery") {
+//         console.log("CASH ON DELIVERY");
+//         const isPlaced = await saveOrder();
+//         if (isPlaced) {
+//           res.json({
+//             // CODsuccess: true,
+//             COD: true,
+//             //ordered
+//           });
+//         } else {
+//           return res.json({
+//             COD: false,
+//           });
+//         }
+//       }
+
+//       if (payMethod === "razorpay") {
+//         const amount = req.body.amount;
+
+//         let instance = new Razorpay({
+//           key_id: "rzp_test_RgbHBDrROekluj",
+//           key_secret: "uRixJRQVnd8RCggLiHa5SEaG",
+//         });
+//         const order = await instance.orders.create({
+//           amount: amount * 100,
+//           currency: "INR",
+//           receipt: "Manikandan",
+//         });
+//         await saveOrder();
+
+//         res.json({
+//           razorPaySucess: true,
+//           order,
+//           amount,
+//         });
+//       }
+
+//       /// payment method wallet function
+
+//       if (payMethod === "wallet") {
+//         const newWallet = req.body.updateWallet;
+//         const userData = req.session.user;
+
+//         await User.findByIdAndUpdate(
+//           userData._id,
+//           { $set: { wallet: newWallet + 50 } },
+//           { new: true }
+//         );
+
+//         await saveOrder();
+//         if (req.body.couponData) {
+//           await User.updateOne(
+//             { _id: req.session.user._id },
+//             {
+//               $push: {
+//                 history: {
+//                   amount: req.body.couponData.newTotal + 50,
+//                   status: "debited",
+//                   date: Date.now(),
+//                 },
+//               },
+//             }
+//           );
+//         } else {
+//           await User.updateOne(
+//             { _id: req.session.user._id },
+//             {
+//               $push: {
+//                 history: {
+//                   amount: totalamount,
+//                   status: "debited",
+//                   date: Date.now(),
+//                 },
+//               },
+//             }
+//           );
+//         }
+
+//         res.json({
+//           walletSucess: true,
+//         });
+//       }
+//     }
+
+
+//   } catch (error) {
+//     console.log(error.message);
+//     res.status(500).send("Internal Server Error");
+//   }
+// };
+
+
 const placeorder = async (req, res) => {
   try {
     console.log("place order ");
@@ -99,7 +297,6 @@ const placeorder = async (req, res) => {
           userId: ID,
         },
       },
-
       {
         $lookup: {
           from: "products",
@@ -135,36 +332,42 @@ const placeorder = async (req, res) => {
 
     console.log(productDet, "aggregated cart prods");
 
+    // Apply coupon if present
+    let finalTotal = totalamount;
+    let discountAmt = 0;
+
+    if (req.body.couponData) {
+      finalTotal = req.body.couponData.newTotal;
+      discountAmt = req.body.couponData.discountAmt;
+    }
+
+    const DELIVERY_CHARGE = 50;
+    const grandTotal = finalTotal + DELIVERY_CHARGE;
+
+
+
+    // Save the order
     let saveOrder = async () => {
-      if (req.body.couponData) {
-        const order = new Order({
-          userId: ID,
-          product: productDet,
-          address: addressId,
-          orderId: ordeId,
-          total: totalamount + 50,
-          paymentMethod: payMethod,
-          discountAmt: req.body.couponData.discountAmt,
-          amountAfterDscnt: req.body.couponData.newTotal + 50,
-          coupon: req.body.couponName,
-          couponUsed: true,
-        });
+      const order = new Order({
+        userId: ID,
+        product: productDet,
+        address: addressId,
+        orderId: ordeId,
+        total: grandTotal,
+        paymentMethod: payMethod,
+        discountAmt: discountAmt,
+        amountAfterDscnt: grandTotal,  // The grand total after discount + delivery charge
+        coupon: req.body.couponName,
+        couponUsed: req.body.couponData ? true : false,
+      });
 
-        const ordered = await order.save();
-        console.log(ordered, "ordersaved DATAAAA with coupon");
-      } else {
-        const order = new Order({
-          userId: ID,
-          product: productDet,
-          address: addressId,
-          orderId: ordeId,
-          total: totalamount + 50,
-          paymentMethod: payMethod,
-        });
+      if (req.body.status) {
+        order.status = "Payment Failed";
+        console.log("Payment Failed  ", order.status)
+    }
 
-        const ordered = await order.save();
-        console.log(ordered, "ordersaved DATAAAA");
-      }
+      const ordered = await order.save();
+      console.log(ordered, "ordersaved DATAAAA");
 
       productDet.forEach(async (product) => {
         await Product.updateMany(
@@ -178,32 +381,15 @@ const placeorder = async (req, res) => {
       }).lean();
 
       console.log(deletedCart, "deletedCart");
-
-
     };
-
-    console.log(addressId);
 
     if (addressId) {
       if (payMethod === "cash-on-delivery") {
         console.log("CASH ON DELIVERY");
-        const isPlaced = await saveOrder();
-        if (isPlaced) {
-          res.json({
-            // CODsuccess: true,
-            COD: true,
-            //ordered
-          });
-        } else {
-          return res.json({
-            COD: false,
-          });
-        }
-      }
-
-      if (payMethod === "razorpay") {
-        const amount = req.body.amount;
-
+        await saveOrder();
+        res.json({ COD: true });
+      } else if (payMethod === "razorpay") {
+        const amount = grandTotal;
         let instance = new Razorpay({
           key_id: "rzp_test_RgbHBDrROekluj",
           key_secret: "uRixJRQVnd8RCggLiHa5SEaG",
@@ -220,13 +406,8 @@ const placeorder = async (req, res) => {
           order,
           amount,
         });
-      }
-
-      /// payment method wallet function
-
-      if (payMethod === "wallet") {
+      } else if (payMethod === "wallet") {
         const newWallet = req.body.updateWallet;
-        const userData = req.session.user;
 
         await User.findByIdAndUpdate(
           userData._id,
@@ -235,46 +416,18 @@ const placeorder = async (req, res) => {
         );
 
         await saveOrder();
-        if (req.body.couponData) {
-          await User.updateOne(
-            { _id: req.session.user._id },
-            {
-              $push: {
-                history: {
-                  amount: req.body.couponData.newTotal + 50,
-                  status: "debited",
-                  date: Date.now(),
-                },
-              },
-            }
-          );
-        } else {
-          await User.updateOne(
-            { _id: req.session.user._id },
-            {
-              $push: {
-                history: {
-                  amount: totalamount,
-                  status: "debited",
-                  date: Date.now(),
-                },
-              },
-            }
-          );
-        }
 
-        res.json({
-          walletSucess: true,
-        });
+        res.json({ walletSucess: true });
       }
     }
-
-
   } catch (error) {
     console.log(error.message);
     res.status(500).send("Internal Server Error");
   }
 };
+
+
+
 
 const orderSuccess = async (req, res) => {
   try {

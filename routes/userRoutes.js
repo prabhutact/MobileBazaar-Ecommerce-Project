@@ -3,14 +3,14 @@ const router = express.Router()
 const { logedout, logedin, isBlocked } = require('../middleware/usersAuth')
 const { getHome, getLogin, getSignup, doSignup, getOtp, submitOtp, resendOtp, doLogin, doLogout , googleCallback, productDetails } = require("../controllers/userController/userController")
 const { submitMail, submitMailPost, forgotOtppage, forgotOtpSubmit, resetPasswordPage, resetPassword } = require('../controllers/userController/forgotPassword')
-const { viewUserProfile, EditUserProfile, updateUserProfile, changePassword, updatePassword, my_Orders, orderDetails, verify, walletpage } = require('../controllers/userController/profile')
+const { viewUserProfile, EditUserProfile, updateUserProfile, changePassword, updatePassword, my_Orders, orderDetails, verify, walletpage, retryPayment } = require('../controllers/userController/profile')
 const { addAddress, addAddressPost, manageAddress, editAddress, editAddressPost, deleteAddress } = require('../controllers/userController/addressManagement')
 const { loadCartPage, addToCart, removeFromCart, updateCart, checkOutOfStock } = require('../controllers/userController/cart')
 const { loadCheckoutPage, placeorder, orderSuccess, validateCoupon, applyCoupon, removeCoupon } = require('../controllers/userController/checkoutManagement')
 const { getProduct, searchAndSort } = require('../controllers/userController/shopManagement')
 const { showWishlistPage, addToWishList, removeFromWishList } = require('../controllers/userController/wishlistManagement')
 const { addMoneyToWallet , verifyPayment }= require('../controllers/userController/walletManagement')
-const { cancelOrder,returnOrder, cancelOneProduct , returnOneProduct, getInvoice }= require('../controllers/userController/orderManagement')
+const { payment_failed, cancelOrder,returnOrder, cancelOneProduct , returnOneProduct, getInvoice }= require('../controllers/userController/orderManagement')
 require('../middleware/googlAuth')
 const passport = require('passport');
 const store = require("../middleware/multer")
@@ -88,6 +88,7 @@ router.get('/delete_address/:id', logedin, isBlocked, deleteAddress)
 router.get('/myOrders', logedin, isBlocked, my_Orders)
 router.get('/orderDetails/:id', logedin, isBlocked, orderDetails)
 router.post('/verifyPayment', logedin, isBlocked, verify)
+router.post('/retry-payment/:id',logedin, isBlocked, retryPayment)
 
 // Cart Page
 
@@ -109,6 +110,7 @@ router.post('/verify_Payment', logedin, isBlocked,verifyPayment)
 router.get('/cart/checkout', logedin, isBlocked, loadCheckoutPage)
 router.post('/placeorder', placeorder)
 router.get('/orderPlaced', logedin, isBlocked, orderSuccess)
+router.get('/payment_failed', logedin , isBlocked , payment_failed)
 
 router.post('/validate_coupon', logedin, isBlocked, validateCoupon)
 router.post('/apply_coupon',applyCoupon)
@@ -133,6 +135,8 @@ router.put('/cancel-one-product', cancelOneProduct);
 router.put('/return-one-product', returnOneProduct);
 
 router.get('/get_invoice', logedin, isBlocked, getInvoice)
+
+
 
 
 module.exports = router

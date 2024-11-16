@@ -350,6 +350,24 @@ const walletpage = async (req, res) => {
   }
 }
 
+
+const retryPayment = async(req, res) =>{
+  try {
+
+    const id = req.params.id
+    console.log("retry pymenyyyyyytt" , id )
+    await Order.findByIdAndUpdate(id, { $set: { status: 'pending' } }, { new: true });
+
+      res.json({
+          razorPaySucess: true,
+          order
+      })
+    
+  } catch (error) {
+    
+  }
+ }
+
 module.exports = {
   viewUserProfile,
   EditUserProfile,
@@ -359,5 +377,6 @@ module.exports = {
   my_Orders,
   orderDetails,
   verify,
-  walletpage
+  walletpage,
+  retryPayment
 };

@@ -8,7 +8,38 @@ const easyinvoice = require('easyinvoice');
 const mongoose = require('mongoose')
 
 
+// const payment_failed = (req, res) => {
+//     try {
+//       const userData = req.session.user
+//         res.render('user/paymentFailed', {userData})
+//     } catch (error) {
+//         console.log(error);
+//     }
+//   }
+  
 
+const payment_failed = (req, res) => {
+    try {
+        const userData = req.session.user;  // Get user data from session
+        const { error, payment_method, order_id } = req.query;  // Get the error details, payment method, and order ID from the query params
+
+        // Log the error for debugging purposes (you can also save this to a log file or database if needed)
+        console.error("Payment failed for order:", order_id);
+        console.error("Error details:", error);
+
+        // Render the payment failed page with additional error details
+        res.render('user/paymentFailed', {
+            userData,
+            error,            // Send the error object received from Razorpay
+            payment_method,   // Send the payment method used (like "razorpay", "cash-on-delivery", etc.)
+            order_id,         // Send the order ID that failed
+            message: 'Your payment attempt failed. Please try again or choose another payment method.'
+        });
+    } catch (error) {
+        console.log("Error in payment_failed route:", error);
+        res.status(500).send("Internal Server Error");
+    }
+}
 
 
 const cancelOrder = async (req, res) => {
@@ -395,10 +426,11 @@ const getInvoice = async (req, res) => {
 
 
 module.exports = {
-  cancelOrder,
-  cancelOneProduct,
-  returnOrder,
-  returnOneProduct,
-  getInvoice  
+    payment_failed,
+    cancelOrder,
+    cancelOneProduct,
+    returnOrder,
+    returnOneProduct,
+    getInvoice  
 
 }

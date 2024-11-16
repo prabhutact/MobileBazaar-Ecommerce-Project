@@ -62,8 +62,8 @@ router.post('/admin/editcoupon/:id', editCouponPost);
 router.delete('/admin/delete_coupon',isLogin,deleteCoupon)
 
 // Chart
-router.get('/get_sales',isLogin, getSales)
-router.get('/get_chart_data',isLogin, getChartData)
+router.get('/admin/get_sales',isLogin, getSales)
+router.get('/admin/get_chart_data',isLogin, getChartData)
 
 
 
