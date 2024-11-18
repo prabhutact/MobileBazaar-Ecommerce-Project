@@ -287,6 +287,9 @@ const placeorder = async (req, res) => {
     const totalamount = req.body.amount;
     console.log("Request dot body  ", addressId, payMethod, totalamount);
 
+    console.log('Coupon data:', req.body.couponData); // To check if the couponData is passed
+console.log('Coupon Name:', req.body.couponName); // To check the coupon name value
+
     const result = Math.random().toString(36).substring(2, 7);
     const id = Math.floor(100000 + Math.random() * 900000);
     const ordeId = result + id;
@@ -337,6 +340,7 @@ const placeorder = async (req, res) => {
     let discountAmt = 0;
 
     if (req.body.couponData) {
+      console.log(req.body.couponData)
       finalTotal = req.body.couponData.newTotal;
       discountAmt = req.body.couponData.discountAmt;
     }
@@ -357,7 +361,7 @@ const placeorder = async (req, res) => {
         paymentMethod: payMethod,
         discountAmt: discountAmt,
         amountAfterDscnt: grandTotal,  // The grand total after discount + delivery charge
-        coupon: req.body.couponName,
+        coupon: req.body.couponName ? req.body.couponName : "",
         couponUsed: req.body.couponData ? true : false,
       });
 

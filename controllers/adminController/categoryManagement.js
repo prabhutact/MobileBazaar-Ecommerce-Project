@@ -100,7 +100,7 @@ const unListCategory = async (req, res) => {
 const showEditCategory = async (req, res) => {
   try {
     const categoryId = req.params.id;
-    const category = await Category.findById(categoryId).lean();
+    const category = await Category.findById(categoryId).lean()
     res.render("admin/editCategory", { layout: "adminlayout", category });
   } catch (error) {}
 };

@@ -38,7 +38,7 @@ const loadDashboard = async (req, res) => {
             },
             {
                 $lookup: {
-                    from: "category",
+                    from: "categories",
                     localField: "_id",
                     foreignField: "_id",
                     as: "categoryDetails"
@@ -68,7 +68,7 @@ const loadDashboard = async (req, res) => {
         const salesByMonth = {};
 
         sales.forEach((sale) => {
-            const monthYear = moment(sale.date).format('MMMM YYYY');
+            const monthYear = moment(sale.date).format('DD MMM YYYY h:mm A');
             if (!salesByMonth[monthYear]) {
                 salesByMonth[monthYear] = {
                     totalOrders: 0,
@@ -159,7 +159,7 @@ const getSales = async (req, res) => {
         console.log(orders);
 
         const formattedOrders = orders.map((order) => ({
-            date: moment(order.date).format('YYYY-MM-DD'),
+            date: moment(order.date).format('DD MMM YYYY h:mm A'),
             ...order._doc
         }));
 
@@ -167,26 +167,34 @@ const getSales = async (req, res) => {
 
         let salesData = [];
 
+        let grandTotal = 0;
+
         formattedOrders.forEach((element) => {
             salesData.push({
                 date: element.date,
                 orderId: element.orderId,
                 total: element.total,
                 payMethod: element.paymentMethod,
+                coupon: element.coupon,           
+                couponUsed: element.couponUsed,
                 proName: element.product,
             });
-        });
-
-        let grandTotal = 0;
-
-        salesData.forEach(element => {
             grandTotal += element.total;
         });
+
+        // let grandTotal = 0;
+
+        const salesCount = salesData.length;
+
+        // salesData.forEach(element => {
+        //     grandTotal += element.total;
+        // });
 
         console.log(grandTotal);
 
         res.json({
             grandTotal: grandTotal,
+            salesCount: salesCount,
             orders: salesData,
         });
     } catch (error) {

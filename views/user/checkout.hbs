@@ -270,6 +270,7 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
 <script>
+
     let couponData
     let couponEl
     let newTotal
@@ -286,7 +287,7 @@
 
     const toggleCoupon = async () => {
         ct+=1
-        const couponEl = document.getElementById('copon').value;
+        couponEl = document.getElementById('copon').value;
         const currentStatus = document.getElementById('couponBtn').innerText.trim();
         const endpoint = currentStatus === 'Apply' ? '/apply_coupon' : '/remove_coupon';
 
@@ -379,7 +380,7 @@
             if (result.isConfirmed) {
                 subTotal = Number(document.getElementsByName('subTotal')[0].value);
                 if (paymentMethod === 'cash-on-delivery') {
-                    if (subTotal > 1000) {
+                    if (subTotal >= 1000) {
                         Swal.fire({
                             title: 'Error',
                             text: 'Cash on delivery is not available for orders above ₹1000',
@@ -442,7 +443,7 @@
                 couponName: couponEl,
                 updateWallet: updateWallet
             }
-
+            
             if (!paymentStatus) {
                 console.log('payment status failed   =>        ')
             requestBody.status = "Payment Failed";

@@ -3,7 +3,7 @@ const moment = require('moment');
 function incHelper(Handlebars) {
 
   Handlebars.registerHelper('inc', function (value,value2) {
-      return value -value2;
+      return value - value2;
   });
 }
 

@@ -45,6 +45,13 @@ const orderSchema = new Schema({
     type: Number,
   
   },
+  coupon: {
+    type: String,
+  },
+  couponUsed: {
+    type: Boolean,
+    default: false,
+  },
 
   paymentMethod: {
     type: String,

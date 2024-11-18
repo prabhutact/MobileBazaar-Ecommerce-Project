@@ -120,6 +120,7 @@ const updateProduct = async (req, res) => {
     }
 
     const { name, price, description, category, stock } = req.body;
+    
 
     await Product.findByIdAndUpdate(
       proId,

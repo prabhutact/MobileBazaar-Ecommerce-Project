@@ -374,24 +374,27 @@
         if (Validation(form)) {
             Swal.fire({
                 title: "Are you sure?",
-                text: "Do you want to save changes?",
+                text: "Do you want to Add the Product?",
                 icon: "warning",
                 showCancelButton: true,
                 confirmButtonColor: "#088178",
                 cancelButtonColor: "#d33",
-                confirmButtonText: "Yes, change it!"
+                confirmButtonText: "Yes!"
             }).then((result) => {
                 if (result.isConfirmed) {
-                    form.submit(); // Submit the form if user clicks "Yes"
-                }
-            }).then(() => {
-                // Show success message after form submission
-                Swal.fire({
+                    Swal.fire({
                     title: "Saved",
-                    text: "The Data has been saved",
-                    icon: "success"
+                    text: "Product added successfully",
+                    icon: "success",
+                    confirmButtonText: "OK"
+                }).then(() => {
+                    form.submit();
                 });
-            });
+                }else {
+               
+                console.log("User canceled the action");
+            }
+            }); 
         }
     }
 </script>

@@ -2,45 +2,7 @@
     <script src="https://cdn.jsdelivr.net/npm/handlebars/dist/handlebars.min.js"></script>
 </head>
 
-
-
-<main class="main-wrap">
-    {{!-- <header class="main-header navbar">
-        <div class="col-search">
-            <form class="searchform">
-                <div class="input-group">
-                    <input list="search_terms" type="text" class="form-control" placeholder="Search term">
-                    <button class="btn btn-light bg" type="button"> <i class="material-icons md-search"></i></button>
-                </div>
-                <datalist id="search_terms">
-                    <option value="Products">
-                    <option value="New orders">
-                    <option value="Apple iphone">
-                    <option value="Ahmed Hassan">
-                </datalist>
-            </form>
-        </div>
-        <div class="col-nav">
-            <button class="btn btn-icon btn-mobile me-auto" data-trigger="#offcanvas_aside"> <i
-                    class="material-icons md-apps"></i> </button>
-            <ul class="nav">
-                <li class="nav-item">
-                    <a class="nav-link btn-icon" href="#">
-                        <i class="material-icons md-notifications animation-shake"></i>
-                        <span class="badge rounded-pill">3</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link btn-icon darkmode" href="#"> <i class="material-icons md-nights_stay"></i> </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="requestfullscreen nav-link btn-icon"><i class="material-icons md-cast"></i></a>
-                </li>
-
-            </ul>
-        </div>
-    </header> --}}
-
+<main class="main-wrap">   
     <section class="content-main">
         <div class="content-header">
             <div>
@@ -57,10 +19,7 @@
                                 class="text-primary material-icons md-monetization_on"></i></span>
                         <div class="text">
                             <h6 class="mb-1 card-title">Total Revenue</h6>
-                            <span>₹{{totalRevnue}}</span>
-                            <span class="text-sm">
-                                Shipping fees are not included
-                            </span>
+                            <span>₹{{totalRevnue}}</span>                            
                         </div>
                     </article>
                 </div>
@@ -71,10 +30,7 @@
                         <span class="icon icon-sm rounded-circle bg-success-light"><i
                                 class="text-success material-icons md-local_shipping"></i></span>
                         <div class="text">
-                            <h6 class="mb-1 card-title">Total Orders</h6> <span>{{thisMonthOrder}}</span>
-                            <span class="text-sm">
-                                Excluding orders in transit
-                            </span>
+                            <h6 class="mb-1 card-title">Total Orders</h6> <span>{{thisMonthOrder}}</span>                            
                         </div>
                     </article>
                 </div>
@@ -86,9 +42,9 @@
                                 class="text-warning material-icons md-qr_code"></i></span>
                         <div class="text">
                             <h6 class="mb-1 card-title">This Month sales</h6> <span>{{thisMonthOrder}}</span>
-                            <span class="text-sm">
+                            {{!-- <span class="text-sm">
                                 In {{categoryCount}} Categories
-                            </span>
+                            </span> --}}
                         </div>
                     </article>
                 </div>
@@ -99,10 +55,7 @@
                         <span class="icon icon-sm rounded-circle bg-info-light"><i
                                 class="text-info material-icons md-shopping_basket"></i></span>
                         <div class="text">
-                            <h6 class="mb-1 card-title">Monthly Earning</h6> <span>₹{{thisMonthSales}}</span>
-                            <span class="text-sm">
-                                Based in your local time.
-                            </span>
+                            <h6 class="mb-1 card-title">Monthly Earning</h6> <span>₹{{thisMonthSales}}</span>                            
                         </div>
                     </article>
                 </div>
@@ -176,7 +129,7 @@
                         
                        
                         <div class="col-md-12 col-12">
-                            <h5>Best Selling</h5>
+                            <h5>Best Selling Products</h5>
                         </div>
                         
                     </div>
@@ -297,10 +250,7 @@
         </div>
          
            
-        
-
-
-
+    
     </section> <!-- content-main end// -->
     <footer class="main-footer font-xs">
         <div class="row pb-30 pt-15">
@@ -317,6 +267,7 @@
         </div>
     </footer>
 </main>
+
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="/javascripts/chart.js"></script>
@@ -422,30 +373,49 @@ function salesGraph(months, ordersByMonth) {
 }
 
 
-function revenue(months,revenueByMonth){
-    const ctx1 = document.getElementById('myChar');
+function revenue(months, revenueByMonth) {
+    const ctx1 = document.getElementById('myChar').getContext('2d');
     new Chart(ctx1, {
-        type: 'line',
+        type: 'bar', // Bar chart type
         data: {
             labels: months,
             datasets: [{
                 label: '# Revenue',
                 data: revenueByMonth,
-                borderColor:['rgba(255, 99, 132, 1)',
-                             'rgba(54, 162, 235, 1)'
-                            ],
-                borderWidth: 2
+                backgroundColor: 'rgba(54, 162, 235, 0.2)', // Light blue color for the bars
+                borderColor: 'rgba(54, 162, 235, 1)', // Border color
+                borderWidth: 1
             }]
         },
         options: {
+            indexAxis: 'y', // Make the bars horizontal
             scales: {
+                x: {
+                    beginAtZero: true, // Start the x-axis from 0
+                },
                 y: {
-                    beginAtZero: true
+                    beginAtZero: true // Start the y-axis from 0
+                }
+            },
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(tooltipItem) {
+                            return tooltipItem.label + ': ' + tooltipItem.raw + ' revenue';
+                        }
+                    }
                 }
             }
         }
     });
 }
+
+
+
 
 
 function categoryRevenue(categories, revenues) {
@@ -467,7 +437,7 @@ function categoryRevenue(categories, revenues) {
                     'rgba(75, 192, 192, 0.2)',
                     'rgba(153, 102, 255, 0.2)',
                     'rgba(255, 159, 64, 0.2)'
-                    // Add more colors if needed
+                    
                 ],
                 borderColor: [
                     'rgba(255, 99, 132, 1)',
@@ -476,7 +446,7 @@ function categoryRevenue(categories, revenues) {
                     'rgba(75, 192, 192, 1)',
                     'rgba(153, 102, 255, 1)',
                     'rgba(255, 159, 64, 1)'
-                    // Matching border colors
+                    
                 ],
                 borderWidth: 1
             }]

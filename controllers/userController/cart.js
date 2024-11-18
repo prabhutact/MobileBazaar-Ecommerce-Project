@@ -201,12 +201,12 @@ const updateCart = async (req, res) => {
       "cartquant--------------------------------------------------------------"
     );
 
-    if (req.body.newValue > 4) {
-      return res.json({
-        success: false,
-        message: "You can only choose up to 4 units of this product.",
-      });
-    }
+    // if (req.body.newValue > 4) {
+    //   return res.json({
+    //     success: false,
+    //     message: "You can only choose up to 4 units of this product.",
+    //   });
+    // }
 
     if (req.body.newValue > cartquant.stock) {
       return res.json({

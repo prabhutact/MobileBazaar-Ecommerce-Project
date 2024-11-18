@@ -57,11 +57,10 @@
                                         </ul>
                                     </div>
                                     <div class="detail-extralink">
-                                        <div class="border radius ">
+                                        {{!-- <div class="border radius ">
                                             <input class="order__quantity--input" type="number" placeholder="1"
                                                 name="quantity" value="1">
-
-                                        </div>
+                                        </div> --}}
                                     <div class="bt-1 border-color-1 mt-30 mb-30"></div>
                                     
                                     <div class="product-extra-link2">
@@ -95,9 +94,9 @@
                                             <a href="#" rel="tag">Android</a> 
                                         </li>
                                         {{#if product.stock}}       
-                                        <li>Availability: <span class="in-stock text-success ml-5">{{product.stock}} Items In Stock</span></li>
+                                        <li>Availability: <span class="in-stock text-success ml-5 " style="font-weight: bold !important; font-size: 15px;">{{product.stock}} Items In Stock</span></li>
 						                {{else}}
-                                        <li>Availability:<span class="in-stock text-success ml-5">Out of Stock</span></li>
+                                        <li>Availability:<span class="in-stock text-danger ml-5">Out of Stock</span></li>
                                         {{/if}}
                                     </ul>
                                 </div>                                
@@ -120,7 +119,9 @@
         $('.button.button-add-to-cart').on('click', function (e) {
 
             var prodId = $(this).data('product-id');
-            var quantity = $('.order__quantity--input').val()
+            //Suppose Need Input Field before Add to Cart Button in the product detail Page Use this
+            //var quantity = $('.order__quantity--input').length ? $('.order__quantity--input').val() : 1;
+            var quantity = 1;
 
             $.ajax({
                 url: '/addtocart/' + prodId,

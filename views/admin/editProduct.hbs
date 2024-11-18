@@ -81,11 +81,11 @@
                                 <input type="file" class="form-control-file" id="productImage" multiple name="image">
                                 <h6 id="imgAlert" class="mt-2" style="color: red;"></h6>
                             </div>
-
+                            
                             <!-- Buttons -->
                             <div class="d-flex g-2">
                                 <div class="m-2">
-                                    <button type="submit" class="btn btn-primary">Save</button>
+                                    <button onclick="submitform(this.form)" class="btn btn-primary">Save</button>
                                 </div>
                                 <div class="m-2">
                                     <a href="/admin/product" type="button" class="btn btn-primary" id="backbutton">Back</a>
@@ -129,8 +129,8 @@ function Validation() {
     let Qty = document.getElementById("Qty").value;
     let price = document.getElementById("price").value;
 
-    let productNameRegex = /^[a-zA-Z0-9\s'-]+$/;
-    let number = /^[1-9]\d*$/;
+    let productNameRegex = /^[a-zA-Z0-9\s\(\)\-\+]{4,}$/; 
+    let number = /^[0-9]\d*$/;
     let descriptionRegex = /^(?!\s*$)[\s\S]{1,100}$/;
 
     let productNameAlert = document.getElementById("productNameAlert");
@@ -259,6 +259,36 @@ document.addEventListener("DOMContentLoaded", deleteProImg);
 
 <script>
     
+    function submitform(form) {
+    event.preventDefault();    
+    Swal.fire({
+        title: "Do you want to save the changes?",
+        text: "Changes made will be saved.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#088178",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, save it!",
+        cancelButtonText: "No, cancel"
+    
+    }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                    title: "Saved",
+                    text: "Your changes have been saved.",
+                    icon: "success",
+                    confirmButtonText: "OK"
+                }).then(() => {
+                    form.submit();
+                });
+                }else {
+               
+                console.log("User canceled the action");
+            }
+            }); 
+        }
+    
+
     // Back Button
 
     $(document).ready(function () {

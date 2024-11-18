@@ -351,22 +351,56 @@ const walletpage = async (req, res) => {
 }
 
 
-const retryPayment = async(req, res) =>{
+// const retryPayment = async(req, res) =>{
+//   try {
+
+//     const id = req.params.id
+//     console.log("retry pymenyyyyyytt" , id )
+//     await Order.findByIdAndUpdate(id, { $set: { status: 'pending' } }, { new: true });
+
+//       res.json({
+//           razorPaySucess: true,
+//           order
+//       })
+    
+//   } catch (error) {
+    
+//   }
+//  }
+
+const retryPayment = async (req, res) => {
   try {
+      // Get the order ID from the request parameters
+      const id = req.params.id;
+      console.log("Retry Payment for order ID:", id);
 
-    const id = req.params.id
-    console.log("retry pymenyyyyyytt" , id )
-    await Order.findByIdAndUpdate(id, { $set: { status: 'pending' } }, { new: true });
+      // Update the order status to 'pending' in the database
+      const updatedOrder = await Order.findByIdAndUpdate(id, { $set: { status: 'pending' } }, { new: true });
 
+      // Check if the order exists and was updated successfully
+      if (!updatedOrder) {
+          return res.status(404).json({
+              success: false,
+              message: "Order not found."
+          });
+      }
+
+      // If the update is successful, return a success response
       res.json({
-          razorPaySucess: true,
-          order
-      })
-    
+          success: true,
+          message: "Payment status has been set to 'pending'. You can retry the payment.",
+          order: updatedOrder
+      });
   } catch (error) {
-    
+      // Catch any errors and send an error response
+      console.error("Error updating payment status:", error);
+      res.status(500).json({
+          success: false,
+          message: "An error occurred while retrying the payment. Please try again later."
+      });
   }
- }
+};
+
 
 module.exports = {
   viewUserProfile,
