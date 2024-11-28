@@ -78,6 +78,8 @@ const cancelOrder = async (req, res) => {
 
         }
 
+       
+
         if (['wallet', 'razorpay'].includes(canceledOrder.paymentMethod)) {
             for (const data of canceledOrder.product) {
                 //await Product.updateOne({ _id: data._id }, { $inc: { stock: data.quantity } });
@@ -87,6 +89,7 @@ const cancelOrder = async (req, res) => {
                 );
                 notCancelledAmt += data.price * data.quantity;
             }
+            
 
             await User.updateOne(
                 { _id: req.session.user._id },

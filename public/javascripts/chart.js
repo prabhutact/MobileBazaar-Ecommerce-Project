@@ -1,10 +1,10 @@
 
 const today = new Date().toISOString().split('T')[0];
 const tomorrow = new Date();
-tomorrow.setDate(tomorrow.getDate()+1);
+tomorrow.setDate(tomorrow.getDate());
 const maxDate = tomorrow.toISOString().split('T')[0];
 
-document.getElementById("start-date").setAttribute("min", today)
+//document.getElementById("start-date").setAttribute("min", today)
 document.getElementById("start-date").setAttribute("max", maxDate);
 document.getElementById("end-date").setAttribute("min", today)
 document.getElementById("end-date").setAttribute("max", maxDate);

@@ -1,6 +1,8 @@
 const Category = require("../../model/categoryModel");
 const fs = require("fs");
 const path = require("path");
+const Product = require("../../model/productModel");
+const productModel = require("../../model/productModel");
 
 // Get Category Page
 
@@ -81,6 +83,7 @@ const unListCategory = async (req, res) => {
   try {
     const { id } = req.body;
     let category = await Category.findById(id);
+    let product = await Product.findById(id)
     let newListed = category.isListed;
 
     await Category.findByIdAndUpdate(
@@ -88,6 +91,10 @@ const unListCategory = async (req, res) => {
       { $set: { isListed: !newListed } },
       { new: true }
     );
+    
+    let updated = await productModel.updateMany({category : category} , {$set: {isBlocked : newListed}});
+
+    console.log("updated => ",updated)
     res.redirect("/admin/category");
   } catch (error) {
     console.log(error.message);

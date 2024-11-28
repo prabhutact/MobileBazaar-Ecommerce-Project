@@ -376,9 +376,14 @@ console.log('Coupon Name:', req.body.couponName); // To check the coupon name va
       productDet.forEach(async (product) => {
         await Product.updateMany(
           { _id: product._id },
-          { $inc: { stock: -product.quantity } }
+          { $inc: { stock: -product.quantity, bestSelling:1 } }
         );
       });
+      productDet.forEach(async (product) => {
+        const populatedProd= await Product.findById(product._id).populate("category").lean()
+        await Category.updateMany({ _id: populatedProd.category._id }, { $inc: { bestSelling:1} });
+
+    })
 
       const deletedCart = await Cart.deleteMany({
         userId: ID,

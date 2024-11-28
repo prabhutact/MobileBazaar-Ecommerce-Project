@@ -6,16 +6,23 @@ const moment = require('moment');
 
 const couponPage= async(req,res)=>{
     try {
-        const couponData = await Coupon.find().lean();
-        console.log(couponData);
 
-       
         const couponMsg = req.session.couponMsg;        
         req.session.couponMsg = null;
         const couponExMsg = req.session.couponExMsg;        
         req.session.couponExMsg = null;
-    
-        res.render('admin/coupon',{couponData, couponMsg, couponExMsg, title:"Admin",layout:'adminlayout'})
+
+        var page = 1
+        if(req.query.page){
+            page = req.query.page
+        }
+        let limit = 1     
+        const couponData = await Coupon.find().skip((page-1)*limit).limit(limit*1).lean()
+        const count = await Coupon.find({}).countDocuments();
+        const totalPages = Math.ceil(count / limit);
+        const pages = Array.from({ length: totalPages }, (_, i) => i + 1);  
+
+        res.render('admin/coupon',{couponData, couponMsg, couponExMsg, pages, currentPage: page,layout:'adminlayout'})
     } catch (error) {
 
         console.log(error.message);
@@ -155,8 +162,7 @@ const editCouponPost = async (req, res) => {
         
     } catch (error) {
         console.log(error.message);
-        res.status(500).send("Internal Server Error");
-
+        res.status(500).send("Internal Server Error");        
         
     }
   }

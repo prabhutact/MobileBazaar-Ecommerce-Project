@@ -109,14 +109,9 @@ const doLogin = async (req, res) => {
 
 const doLogout = async (req, res) => {
   try {
-    req.session.destroy((err) => {
-      if (err) {
-        console.log("Logout error");
-        res.redirect("/");
-      }
-      res.redirect("/login");
-    });
+    req.session.user= null    
     userData = null;
+    res.redirect("/login");    
   } catch (error) {
     console.log(error.message);
   }

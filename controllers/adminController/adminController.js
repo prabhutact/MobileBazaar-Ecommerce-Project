@@ -10,6 +10,9 @@ const getLogin = async (req, res) => {
 };
 
 
+
+
+
 // Get Home Page
 
 // const getHome = async (req, res) => {
@@ -25,7 +28,7 @@ const getLogin = async (req, res) => {
 
 const doLogin = async (req, res) => {
   try {
-    admin = {
+    const admin = {
       mail: process.env.ADMIN_EMAIL,
       password: process.env.ADMIN_PASSWORD,
     };
@@ -34,6 +37,7 @@ const doLogin = async (req, res) => {
     let adminPass = req.body.password;
     if (admin.mail === adminMail && admin.password === adminPass) {
       req.session.admin = admin;
+      console.log(req.session)
       res.redirect("/admin/home");
     } else {
       res.render("admin/login", {
@@ -52,8 +56,7 @@ const doLogin = async (req, res) => {
 
 const doLogout = async (req, res) => {
   try {
-    req.session.admin = null;
-    req.session.destroy();
+    req.session.admin = null;    
     res.redirect("/admin/login");
   } catch (error) {
     console.log(error);

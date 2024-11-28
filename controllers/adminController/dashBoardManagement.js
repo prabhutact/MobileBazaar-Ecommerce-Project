@@ -68,17 +68,18 @@ const loadDashboard = async (req, res) => {
         const salesByMonth = {};
 
         sales.forEach((sale) => {
-            const monthYear = moment(sale.date).format('DD MMM YYYY h:mm A');
+            const monthYear = moment(sale.date).format('MMMM YYYY');
             if (!salesByMonth[monthYear]) {
                 salesByMonth[monthYear] = {
                     totalOrders: 0,
                     totalRevenue: 0
                 };
             }
+            
             salesByMonth[monthYear].totalOrders += 1;
             salesByMonth[monthYear].totalRevenue += sale.total;
         });
-
+    
         const chartData = [];
 
         Object.keys(salesByMonth).forEach((monthYear) => {
@@ -106,8 +107,11 @@ const loadDashboard = async (req, res) => {
             totalSales += Number(data.totalOrders);
         });
 
-        const thisMonthOrder = odersByMonth[odersByMonth.length - 1];
-        const thisMonthSales = revnueByMonth[revnueByMonth.length - 1];
+        // const thisMonthOrder = odersByMonth[odersByMonth.length - 1];
+        // const thisMonthSales = revnueByMonth[revnueByMonth.length - 1];
+
+        const thisMonthOrder = odersByMonth.length > 0 ? odersByMonth[odersByMonth.length - 1] : 0;
+        const thisMonthSales = revnueByMonth.length > 0 ? revnueByMonth[revnueByMonth.length - 1] : 0;
 
         let bestSellings = await Product.find().sort({ bestSelling: -1 }).limit(5).lean();
         let popuarProducts = await Product.find().sort({ popularity: -1 }).limit(5).lean();
@@ -159,7 +163,7 @@ const getSales = async (req, res) => {
         console.log(orders);
 
         const formattedOrders = orders.map((order) => ({
-            date: moment(order.date).format('DD MMM YYYY h:mm A'),
+            date: moment(order.date).format('YYYY-MM-DD'),
             ...order._doc
         }));
 

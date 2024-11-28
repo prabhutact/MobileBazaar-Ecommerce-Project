@@ -292,21 +292,21 @@ const getChartData = async () => {
         const data = await response.json();
         console.log('Data received:', data);
 
-        // Assign data to variables
+        
          months = data.months;
-         ordersByMonth = data.odersByMonth; // Corrected typo in property name
-         revenueByMonth = data.revnueByMonth; // Corrected typo in property name
+         ordersByMonth = data.odersByMonth; 
+         revenueByMonth = data.revnueByMonth; 
 
          categories = data.cat;
          revenues = data.revenue;
 
-        // Call graph functions with the retrieved data
+        
         salesGraph(months, ordersByMonth);
         revenue(months, revenueByMonth);
-        categoryRevenue(categories, revenues); // Corrected function call
+        categoryRevenue(categories, revenues); 
     } catch (error) {
         console.error('Error fetching or processing data:', error);
-        // Handle errors gracefully here, if needed
+       
     }
 };
 

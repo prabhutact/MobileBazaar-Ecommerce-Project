@@ -6,6 +6,8 @@ const { addCategoryPage, addNewCategory, showCategoryPage, unListCategory, showE
 const { usersPage, blockUser } = require('../controllers/adminController/UserManagement');
 const { ordersPage, orderDetails, changeStatus } = require('../controllers/adminController/ordersManagement');
 const { couponPage, addCouponPage, addCouponPost, editCouponPage, editCouponPost, deleteCoupon } = require('../controllers/adminController/couponManagement');
+
+const{ productOfferPage, addProductOfferPage, addProductOffer, categoryOfferPage, addCategoryOfferPage, addCategoryOffer, deleteCategoryOffer } = require('../controllers/adminController/offerManagement');
 const {  loadDashboard, getSales, getChartData }=require('../controllers/adminController/dashBoardManagement')
 const { isLogin, isLogout } = require("../middleware/adminAuth")
 const store = require('../middleware/multer')
@@ -64,6 +66,16 @@ router.delete('/admin/delete_coupon',isLogin,deleteCoupon)
 // Chart
 router.get('/admin/get_sales',isLogin, getSales)
 router.get('/admin/get_chart_data',isLogin, getChartData)
+
+
+router.get('/admin/productOffers', isLogin, productOfferPage)
+router.get('/admin/addProOffers', isLogin, addProductOfferPage)
+router.post('/admin/addProOffers', isLogin, addProductOffer)
+
+router.get('/admin/categoryOffers', isLogin, categoryOfferPage)
+router.get('/admin/addCatOffers', isLogin, addCategoryOfferPage)
+router.post('/admin/addCatOffers', isLogin, addCategoryOffer)
+router.delete('/admin/deleteCatOffer/:id', isLogin, deleteCategoryOffer)
 
 
 

@@ -456,10 +456,10 @@ const payment = (orderId) => {
     
 
     var options = {
-        "key": "rzp_test_RgbHBDrROekluj", 
+        "key": "rzp_test_OsDtnewxAfAwm0", 
         "amount": amount, // Amount in currency subunits (paise)
         "currency": "INR",
-        "name": "Cake Shop",
+        "name": "Mobile Bazaar",
         "order_id": undefined, // Pass the actual order ID
         "handler": async function (response) {
             // On successful payment, invoke the retryPayment function with the 'Pending' status
@@ -482,11 +482,11 @@ const payment = (orderId) => {
 
 
         var options = {
-      "key": "rzp_test_RgbHBDrROekluj", // Enter the Key ID generated from the Dashboard
+      "key": "rzp_test_OsDtnewxAfAwm0", // Enter the Key ID generated from the Dashboard
       "amount": parseInt(amount), // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
       "currency": "INR",
         
-      "name" : "Cake Shop",
+      "name" : "Mobile Bazaar",
       /*"name": "Acme Corp", //your business name
       "description": "Test Transaction",
       "image": "https://example.com/your_logo",*/
