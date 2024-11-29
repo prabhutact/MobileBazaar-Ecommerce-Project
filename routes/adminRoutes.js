@@ -7,7 +7,7 @@ const { usersPage, blockUser } = require('../controllers/adminController/UserMan
 const { ordersPage, orderDetails, changeStatus } = require('../controllers/adminController/ordersManagement');
 const { couponPage, addCouponPage, addCouponPost, editCouponPage, editCouponPost, deleteCoupon } = require('../controllers/adminController/couponManagement');
 
-const{ productOfferPage, addProductOfferPage, addProductOffer, categoryOfferPage, addCategoryOfferPage, addCategoryOffer, deleteCategoryOffer } = require('../controllers/adminController/offerManagement');
+const{ productOfferPage, addProductOfferPage, addProductOffer, editProductOfferPage, editProductOffer, deleteProductOffer, categoryOfferPage, addCategoryOfferPage, addCategoryOffer, editCategoryOfferPage, editCategoryOffer, deleteCategoryOffer } = require('../controllers/adminController/offerManagement');
 const {  loadDashboard, getSales, getChartData }=require('../controllers/adminController/dashBoardManagement')
 const { isLogin, isLogout } = require("../middleware/adminAuth")
 const store = require('../middleware/multer')
@@ -71,10 +71,15 @@ router.get('/admin/get_chart_data',isLogin, getChartData)
 router.get('/admin/productOffers', isLogin, productOfferPage)
 router.get('/admin/addProOffers', isLogin, addProductOfferPage)
 router.post('/admin/addProOffers', isLogin, addProductOffer)
+router.get('/admin/editProductOffer/:id', isLogin, editProductOfferPage)
+router.post("/admin/editProductOffer/:id", isLogin, editProductOffer);
+router.delete('/admin/deleteProOffer/:id', isLogin, deleteProductOffer)
 
 router.get('/admin/categoryOffers', isLogin, categoryOfferPage)
 router.get('/admin/addCatOffers', isLogin, addCategoryOfferPage)
 router.post('/admin/addCatOffers', isLogin, addCategoryOffer)
+router.get('/admin/editCategoryOffer/:id', isLogin, editCategoryOfferPage)
+router.post("/admin/editCategoryOffer/:id", isLogin, editCategoryOffer);
 router.delete('/admin/deleteCatOffer/:id', isLogin, deleteCategoryOffer)
 
 

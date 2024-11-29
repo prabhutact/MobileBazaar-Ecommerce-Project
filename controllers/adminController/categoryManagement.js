@@ -3,6 +3,7 @@ const fs = require("fs");
 const path = require("path");
 const Product = require("../../model/productModel");
 const productModel = require("../../model/productModel");
+const HttpStatus = require('../../httpStatus');
 
 // Get Category Page
 
@@ -98,7 +99,7 @@ const unListCategory = async (req, res) => {
     res.redirect("/admin/category");
   } catch (error) {
     console.log(error.message);
-    res.status(500).send("Internal Server Error");
+    res.status(HttpStatus.InternalServerError).send("Internal Server Error");
   }
 };
 

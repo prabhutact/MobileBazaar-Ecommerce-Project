@@ -11,19 +11,6 @@ const getLogin = async (req, res) => {
 
 
 
-
-
-// Get Home Page
-
-// const getHome = async (req, res) => {
-//   try {
-//     res.render("admin/home", { layout: "adminLayout" });
-//   } catch (error) {
-//     console.log(error);
-//   }
-// };
-
-
 // Login
 
 const doLogin = async (req, res) => {

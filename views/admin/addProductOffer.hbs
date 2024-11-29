@@ -58,20 +58,14 @@
                         <form id="addProductOfferForm" role="form" action="/admin/addProOffers" method="post">
                     <div class="modal-body">
 
-                        <div class="input-group mb-3">
-                            <label class="container">
-                                <label for="productName" class="mb-2">Product Name: </label>
-                                <select name="productName" id="productName" class="form-select"
-                                    aria-label="Default select example">
-                                    {{#each products}}
-                                    <option>
-                                        <div>{{this.name}}</div>
-                                        <div><img src="/assets/imgs/products/{{imageUrl.[0]}}" alt="ddd"></div>
-                                    </option>
-                                    {{/each}}
-                                </select>
-                            </label>
-                        </div>
+                        <label for="productName" class="mb-2">Product Name:</label>
+                        <select name="productName" id="productName" class="form-select">
+                            {{#each products}}
+                            <option value="{{this.name}}">
+                                {{this.name}}
+                            </option>
+                            {{/each}}
+                        </select>
 
                         <div class="offerPercentageInput p-2">
                             <label for="productOfferPercentage" class="mb-2">Product Offer Percentage: </label>

@@ -41,7 +41,7 @@
                                     <a href="/admin/editProductOffer/{{this._id}}" 
                                         class="btn btn-sm font-sm rounded btn-brand"><i class="material-icons md-edit"></i>Edit  
                                     </a>
-                                    <a href="javascript:void(0);" onclick="deleteCategoryOffer('{{this._id}}')"
+                                    <a href="javascript:void(0);" onclick="deleteProductOffer('{{this._id}}')"
                                         class="btn btn-sm font-sm btn-light"><i class="material-icons md-delete"></i>Delete 
                                     </a>
                                 </td>
@@ -95,7 +95,7 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
-  function deleteCategoryOffer(id) {  
+  function deleteProductOffer(id) {  
   Swal.fire({
     title: "Are you sure?",
     text: "You won't be able to revert this!",
@@ -108,12 +108,12 @@
     if (result.isConfirmed) {
       
       $.ajax({
-        url: `/admin/deleteCatOffer/${id}`, 
+        url: `/admin/deleteProOffer/${id}`, 
         type: "DELETE", 
         success: function (response) {          
           Swal.fire({
             title: "Deleted!",
-            text: "Category offer deleted successfully.",
+            text: "Product offer deleted successfully.",
             icon: "success",
             timer: 2000, 
             showConfirmButton: false,
@@ -123,7 +123,7 @@
             error: function (xhr, status, error) {          
             Swal.fire({
             title: "Error!",
-            text: "Failed to delete the category offer. Please try again.",
+            text: "Failed to delete the product offer. Please try again.",
             icon: "error",
           });
         },

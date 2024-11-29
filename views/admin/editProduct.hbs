@@ -146,17 +146,17 @@ function Validation() {
     longAlert.innerHTML = "";
     imgAlert.innerHTML = "";
 
-    // Validate product name
+    
     if (!productName.match(productNameRegex)) {
         errors.push("Name Not Valid");
     }
 
-    // Validate quantity
+    
     if (!Qty.match(number)) {
         errors.push("Please Check Qty Again");
     }
 
-    // Validate price
+   
     if (!price.match(number)) {
         errors.push("Please Check Price Again");
     }

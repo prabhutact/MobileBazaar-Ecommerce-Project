@@ -162,6 +162,12 @@ function ifCondition(Handlebars){
   
 } 
 
+function eqHelper(Handlebars) {
+    Handlebars.registerHelper('eq', function(a, b) {
+      return a === b;
+    });
+  }
+
 module.exports = {
   incHelper,
   incrementHelper,
@@ -174,5 +180,6 @@ module.exports = {
   length,
   statushelper,
   ifCondition,
-  singleIsCancelled
+  singleIsCancelled,
+  eqHelper
 }
