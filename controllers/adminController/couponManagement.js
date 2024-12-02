@@ -21,7 +21,7 @@ const couponPage= async(req,res)=>{
         const count = await Coupon.find({}).countDocuments();
         const totalPages = Math.ceil(count / limit);
         const pages = Array.from({ length: totalPages }, (_, i) => i + 1);  
-
+        console.log("coupon Data=>",couponData )
         res.render('admin/coupon',{couponData, couponMsg, couponExMsg, pages, currentPage: page,layout:'adminlayout'})
     } catch (error) {
 

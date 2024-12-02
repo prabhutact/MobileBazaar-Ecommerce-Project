@@ -16,10 +16,12 @@ const productOfferSchema = new mongoose.Schema({
         max: 90,
         required: true
     },
+    discountPrice: {
+        type: Number
+    },
     startDate: {
         type: Date,
-        required: true,
-        default: new Date().toLocaleString()
+        required: true
     },
     endDate: {
         type: Date,

@@ -171,55 +171,60 @@
 
 
         products.forEach((product) => {
-            const productHtml = `
-            <div class="col-lg-4 col-md-4 col-12 col-sm-6">
-                <div class="product-cart-wrap mb-30">
-                    <div class="product-img-action-wrap">
-                        <div class="product-img product-img-zoom">
-                            <a href="/productDetails/${product._id}">
-                                <img class="default-img" src="/assets/imgs/products/${product.imageUrl[0]}" alt="">
-                                <img class="hover-img" src="/assets/imgs/products/${product.imageUrl[1]}" alt="">
-                            </a>
-                        </div>
-                        <div class="product-action-1">
-                            <a aria-label="Quick view" class="action-btn hover-up"
-                               href="/productDetails/${product._id}" data-bs-target="#quickViewModal">
-                                <i class="fi-rs-search"></i></a>
-                            <a data-id="${product._id}" aria-label="Add To Wishlist"
-                                                    class="wish action-btn hover-up" href="#"><i
-                                                        class="fi-rs-heart"></i></a>
-                            
-                        </div>
-                        <div class="product-badges product-badges-position product-badges-mrg">
-                            <span class="hot">Hot</span>
-                        </div>
-                    </div>
-                    <div class="product-content-wrap">
-                        <div class="product-category">
-                            <a href="shop-grid-right.html">${product.category.category}</a>
-                        </div>
-                        <h2><a href="/productDetails/${product._id}">${product.name}</a>
-                        </h2>
-                        <div class="rating-result" title="90%">
-                            <span><span>90%</span></span>
-                        </div>
-                        <div class="product-price">
-                            <span>₹${product.price }</span>
-                            {{!-- <span class="old-price">₹10000</span> --}}
-                        </div>
-                        <div class="product-action-1 show">
-                                            <span>
-                                                <a data-id="${product._id}" aria-label="Add To Wishlist"
-                                                    class="wish action-btn hover-up" href="#"><i
-                                                        class="fi-rs-heart"></i></a>
-                                            </span>
-                                           
-                                        </div>
-                    </div>
+const productHtml = `
+    <div class="col-lg-4 col-md-4 col-12 col-sm-6">
+        <div class="product-cart-wrap mb-30">
+            <div class="product-img-action-wrap">
+                <div class="product-img product-img-zoom">
+                    <a href="/productDetails/${product._id}">
+                        <img class="default-img" src="/assets/imgs/products/${product.imageUrl[0]}" alt="">
+                        <img class="hover-img" src="/assets/imgs/products/${product.imageUrl[1]}" alt="">
+                    </a>
+                </div>
+                <div class="product-action-1">
+                    <a aria-label="Quick view" class="action-btn hover-up"
+                       href="/productDetails/${product._id}" data-bs-target="#quickViewModal">
+                        <i class="fi-rs-search"></i></a>
+                    <a data-id="${product._id}" aria-label="Add To Wishlist"
+                                            class="wish action-btn hover-up" href="#"><i
+                                                class="fi-rs-heart"></i></a>
+                    
+                </div>
+                <div class="product-badges product-badges-position product-badges-mrg">
+                    <span class="hot">Hot</span>
                 </div>
             </div>
-        `;
-            productList.append(productHtml);
+            <div class="product-content-wrap">
+                <div class="product-category">
+                    <a href="shop-grid-right.html">${product.category.category}</a>
+                </div>
+                <h2><a href="/productDetails/${product._id}">${product.name}</a></h2>
+                <div class="rating-result" title="90%">
+                    <span><span>90%</span></span>
+                </div>
+                <div class="product-price">
+                    ${
+                        product.discountPrice
+                            ? `<span>₹${product.discountPrice}</span>
+                               <span class="old-price">₹${product.price}</span>`
+                            : `<span>₹${product.price}</span>`
+                    }
+                </div>
+                <div class="product-action-1 show">
+                    <span>
+                        <a data-id="${product._id}" aria-label="Add To Wishlist"
+                            class="wish action-btn hover-up" href="#"><i
+                                class="fi-rs-heart"></i></a>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+`;
+
+// Append to product list
+productList.append(productHtml);
+
         });
     };
     // count.innerHTML=totalProducts

@@ -9,7 +9,7 @@
                     <h5 class="modal-title" id="addCategoryOfferModalLabel">Add Category Offer</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form id="addCategoryOfferForm" role="form" action="/admin/addCatOffers" method="post">
+                <form id="addCategoryOfferForm" role="form" action="/admin/editCategoryOffer/{{editCategoryOfferData._id}}" method="post">
                     <div class="modal-body">
 
                         <div class="input-group mb-3">
@@ -27,7 +27,7 @@
                             <label for="categoryOfferPercentage" class="mb-2">Category Offer Percentage: </label>
                             <div class="input-group">
                                 <input id="categoryOfferPercentage" name="categoryOfferPercentage" class="form-control"
-                                    placeholder="Enter the offer percentage">
+                                    placeholder="Enter the offer percentage" value="{{editCategoryOfferData.categoryOfferPercentage}}">
                             </div>
                             <div class="form-text">Choose a percentage to be discounted. Between 5% and 90%.</div>
                         </div>
@@ -35,7 +35,7 @@
                         <div class="startDateInput p-2">
                             <label for="categoryOfferStartDate">Offer Start Date: </label>
                             <div class="input-group">
-                                <input id="categoryOfferStartDate" name="categoryOfferStartDate" type="date" class="form-control">
+                                <input id="categoryOfferStartDate" name="categoryOfferStartDate" type="date" class="form-control" value="{{startDate}}">
                             </div>
                             <div class="form-text">Choose a start date for the offer to be considered.</div>
                         </div>
@@ -43,7 +43,7 @@
                         <div class="endDateInput p-2">
                             <label for="categoryOfferEndDate">Offer Expiry Date : </label>
                             <div class="input-group">
-                                <input id="categoryOfferEndDate" name="categoryOfferEndDate" type="date" class="form-control">
+                                <input id="categoryOfferEndDate" name="categoryOfferEndDate" type="date" class="form-control" value="{{endDate}}">
                             </div>
                             <div class="form-text">Choose an exipry date for offer to end.</div>
                         </div>

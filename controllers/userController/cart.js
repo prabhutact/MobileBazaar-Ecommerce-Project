@@ -22,24 +22,54 @@ const loadCartPage = async (req, res) => {
         },
       },
       {
+        $unwind: {
+          path: "$productData",
+          preserveNullAndEmptyArrays: true, // To keep cart entries even if no matching product
+        },
+      },
+      {
+        $lookup: {
+          from: "productoffers", // Lookup product offers
+          localField: "productData._id", // Match the product ID
+          foreignField: "productId",
+          as: "productOffer",
+        },
+      },
+      {
+        $unwind: {
+          path: "$productOffer",
+          preserveNullAndEmptyArrays: true, // To keep cart entries even if no active offer
+        },
+      },
+      {
         $project: {
           _id: 1,
           userId: 1,
           quantity: 1,
           value: 1,
-          productName: { $arrayElemAt: ["$productData.name", 0] },
-          productPrice: { $arrayElemAt: ["$productData.price", 0] },
-          productDescription: { $arrayElemAt: ["$productData.description", 0] },
-          productImage: { $arrayElemAt: ["$productData.imageUrl", 0] },
-          stock: { $arrayElemAt: ["$productData.stock", 0] }
+          productName: "$productData.name",
+          productPrice: {
+            $cond: {
+              if: { $gt: [{ $ifNull: ["$productOffer.discountPrice", 0] }, 0] }, // Check if discountPrice exists
+              then: "$productOffer.discountPrice", // Use discountPrice if available
+              else: "$productData.price", // Otherwise use regular price
+            },
+          },
+          productDescription: "$productData.description",
+          productImage: "$productData.imageUrl",
+          stock: "$productData.stock",
         },
       },
     ]);
+    
+    console.log(cartProd);
+    
+    
     console.log(cartProd);
 
     cartProd = cartProd.map(item => {
       if (item.stock <= 0) {
-        item.outOfStock = true; // Add outOfStock flag if product is out of stock
+        item.outOfStock = true; 
       }
       return item;
     });
@@ -110,10 +140,33 @@ const addToCart = async (req, res) => {
       });
     }
 
-    const sampProd = await Product.findOne({ _id: data.prodId }).lean();
-    console.log("Product Data:", sampProd);
+    const productToLookup = await Product.aggregate([
+      { $match: { _id: new mongoose.Types.ObjectId(data.prodId) } }, // Find product by ID
+      {
+        $lookup: {
+          from: "productoffers", // The name of the collection you want to join
+          localField: "_id", // The field in the Product collection
+          foreignField: "productId", // The field in the ProductOffer collection that references Product
+          as: "productOffer", // The field where the joined data will be stored
+        },
+      },
+      {
+        $unwind: { 
+          path: "$productOffer", // Unwind to access individual offer data
+          preserveNullAndEmptyArrays: true, // Keep product even if there's no offer
+        },
+      }
+    ]);
+    let productToCart = productToLookup[0]
+    console.log(productToCart);
+    
 
-    if (!sampProd) {
+    const priceToUse = productToCart.productOffer.discountPrice || productToCart.price; 
+    console.log("priceToUse =>     ",priceToUse)
+
+    console.log("Product Data:", productToCart);
+
+    if (!productToCart) {
       return res
         .status(404)
         .json({ success: false, message: "Product not found" });
@@ -123,6 +176,7 @@ const addToCart = async (req, res) => {
       userId: userData._id,
       product_Id: data.prodId,
     }).lean();
+
     console.log("Product Exist in Cart:", ProductExist);
 
     if (ProductExist.length > 0) {
@@ -139,8 +193,8 @@ const addToCart = async (req, res) => {
       },
       {
         quantity: quantity,
-        price: sampProd.price,
-        value: sampProd.price * quantity,
+        price: priceToUse,
+        value: priceToUse * quantity,
       },
       { new: true, upsert: true }
     );
@@ -255,8 +309,8 @@ const updateCart = async (req, res) => {
       //   newDataItem.totalAmount = newValue;
       // }
       if (data.stock <= 0) {
-    newDataItem.totalAmount = "Out of Stock";  // Set totalAmount to a string if out of stock
-    newDataItem.outOfStock = true; // Mark the product as out of stock
+    newDataItem.totalAmount = "Out of Stock";  
+    newDataItem.outOfStock = true; 
   } else {
     // Calculate the total amount if the product is in stock
     newDataItem.totalAmount = newValue;

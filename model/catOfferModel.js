@@ -5,6 +5,10 @@ const categoryOfferSchema = new mongoose.Schema({
     categoryName: {
         type: String,
         required: true,
+        
+    },
+    categoryId: {
+        type: mongoose.Types.ObjectId,
         ref: 'Category'
     },
     categoryOfferPercentage:{

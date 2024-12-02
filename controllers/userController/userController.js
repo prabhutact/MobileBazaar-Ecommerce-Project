@@ -21,6 +21,9 @@ let userData;
 const getHome = async (req, res) => {
   try {
     const userData = req.session.user;
+
+   
+
     const Products = await Product.aggregate([
       { $match: { isBlocked: false } },
       {
@@ -34,7 +37,56 @@ const getHome = async (req, res) => {
       {
         $unwind: "$category",
       },
+      {
+        $lookup: {
+          from: "productoffers",  // Assuming the collection name is "productoffers"
+          localField: "_id",  // Assuming the product id is the foreign key
+          foreignField: "productId",  // Field in productoffers referencing Product
+          as: "productOffer",
+        },
+      },
+      {
+        $unwind: {
+          path: "$productOffer",
+          preserveNullAndEmptyArrays: true,  // Ensure products without offers are still included
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          name: 1,
+          price: 1,
+          description: 1,
+          stock: 1,
+          popularity: 1,
+          bestSelling: 1,
+          imageUrl: 1,
+          category: {
+            _id: 1,
+            category: 1,
+            imageUrl: 1,
+            isListed: 1,
+            bestSelling: 1,
+          },
+          discountPrice: {
+            $cond: {
+              if: { $eq: ["$productOffer.currentStatus", true] },  // If currentStatus is true
+              then: "$productOffer.discountPrice",  // Show discountPrice if active
+              else: "$price",  // Otherwise, show price as discountPrice
+            },
+          },
+        },
+      },
     ]);
+    
+    console.log(Products);
+    
+    
+    console.log(Products);
+    
+    console.log("Aggregated Product Details 1:", Products);
+
+
     const category = await Category.find({ isListed: true }).lean();
     res.render("user/home", { category, Products, userData });
   } catch (error) {
@@ -243,8 +295,28 @@ const productDetails = async (req, res) => {
     const userData = req.session.user;
     const productID = req.params.id;
     console.log("Product ID: ", productID);
-    const product = await Product.findById(productID).lean();
-    console.log("Product: ", product);
+    
+    const products = await Product.aggregate([
+      { $match: { _id: new ObjectId(productID) } }, // Match product by productID
+      {
+        $lookup: {
+          from: "productoffers",  // Lookup from the productoffers collection
+          localField: "_id",  // The field from Product that we are matching (product ID)
+          foreignField: "productId",  // The field in productoffers that refers to Product's ID
+          as: "productOffer",  // The name of the field where the offer data will be stored
+        },
+      },
+      {
+        $unwind: {
+          path: "$productOffer",  
+          preserveNullAndEmptyArrays: true,  // If no offer is found, it will be included as null
+        },
+      },
+    ]);
+    
+    let product = products[0];
+    console.log(product)
+
     let productExistInCart;
     let outOfStock;
 
@@ -262,6 +334,9 @@ const productDetails = async (req, res) => {
     if (product.stock === 0) {
       outOfStock = true;
     }
+
+
+
     if (userData) {
       const ProductExist = await Cart.find({
         userId: userData._id,
@@ -281,6 +356,7 @@ const productDetails = async (req, res) => {
         productExistInCart,
         ProductExist,
         userData,
+        
       });
     } else {
       res.render("user/productDetails", {
