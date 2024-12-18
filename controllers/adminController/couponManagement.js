@@ -1,7 +1,6 @@
 const Coupon = require('../../model/couponSchema')
 const moment = require('moment');
-
-
+const HttpStatus = require('../../httpStatus');
 
 
 const couponPage= async(req,res)=>{
@@ -12,11 +11,11 @@ const couponPage= async(req,res)=>{
         const couponExMsg = req.session.couponExMsg;        
         req.session.couponExMsg = null;
 
-        var page = 1
+        let page = 1
         if(req.query.page){
             page = req.query.page
         }
-        let limit = 1     
+        const limit = 1     
         const couponData = await Coupon.find().skip((page-1)*limit).limit(limit*1).lean()
         const count = await Coupon.find({}).countDocuments();
         const totalPages = Math.ceil(count / limit);
@@ -26,10 +25,12 @@ const couponPage= async(req,res)=>{
     } catch (error) {
 
         console.log(error.message);
-        res.status(500).send("Internal Server Error");
+        res.status(HttpStatus.InternalServerError).send("Internal Server Error");
         
     }
 }
+
+
 
 const addCouponPage= async(req,res)=>{
     const couponMsg = "Coupon added successfuly..!!";
@@ -49,10 +50,13 @@ const addCouponPage= async(req,res)=>{
     } catch (error) {
 
         console.log(error.message);
-        res.status(500).send("Internal Server Error");
+        res.status(HttpStatus.InternalServerError).send("Internal Server Error");
         
     }
 }
+
+
+
 const addCouponPost = async (req, res) => {
   try {
       const { code, percent, expDate, maxDiscount, minPurchase } = req.body;
@@ -99,9 +103,10 @@ const addCouponPost = async (req, res) => {
       }
   } catch (error) {
       console.error('Error adding coupon:', error.message);
-      res.status(500).send("Internal Server Error");
+      res.status(HttpStatus.InternalServerError).send("Internal Server Error");
   }
 };
+
 
 
 const editCouponPage = async (req, res) => {
@@ -120,49 +125,46 @@ const editCouponPage = async (req, res) => {
         
     } catch (error) {
         console.error(error.message);
-        res.status(500).send("Internal Server Error");
+        res.status(HttpStatus.InternalServerError).send("Internal Server Error");
     }
 };
+
+
 
 const editCouponPost = async (req, res) => {
     try {
         const { code, discount, expDate, minPurchase, maxDiscount } = req.body;
         const couponId = req.params.id;
   
-        // Find the coupon by ID and update the details
         const coupon = await Coupon.findById(couponId);
-        if (!coupon) {
-            return res.status(404).send("Coupon not found");
-        }
   
-        // Update coupon fields
         coupon.code = code;
         coupon.discount = parseFloat(discount);
         coupon.expiryDate = new Date(expDate);
         coupon.minPurchase = parseFloat(minPurchase);
         coupon.maxDiscount = parseFloat(maxDiscount);
-  
-        // Save the updated coupon
+
         await coupon.save();
   
         req.session.couponMsg = 'Coupon updated successfully';
-        res.redirect('/admin/coupons'); // Redirect to the coupons list page
+        res.redirect('/admin/coupons');
     } catch (error) {
         console.error('Error updating coupon:', error.message);
-        res.status(500).send("Internal Server Error");
+        res.status(HttpStatus.InternalServerError).send("Internal Server Error");
     }
   };
 
 
+  
   const deleteCoupon= async(req,res)=>{
     try {
 
-        const {id}=req.body
+        const {id} = req.body
         await Coupon.findByIdAndDelete(id)
         
     } catch (error) {
         console.log(error.message);
-        res.status(500).send("Internal Server Error");        
+        res.status(HttpStatus.InternalServerError).send("Internal Server Error");        
         
     }
   }

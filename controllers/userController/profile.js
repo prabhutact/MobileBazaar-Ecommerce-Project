@@ -1,18 +1,22 @@
-const Category = require("../../model/categoryModel");
-const Product = require("../../model/productModel");
-const User = require("../../model/userModel");
-const { Address } = require("../../model/addressSchema");
+const Category = require("../../model/categorySchema");
+const Product = require("../../model/productSchema");
+const User = require("../../model/userSchema");
+const Address  = require("../../model/addressSchema");
 const userHelper = require("../../helpers/user.helper");
-const Cart = require("../../model/cartModel");
+const Cart = require("../../model/cartSchema");
 const Wishlist = require('../../model/wishlistSchema')
-const Order = require("../../model/orderModel");
+const Order = require("../../model/orderSchema");
 const argon2 = require("argon2");
+const HttpStatus = require('../../httpStatus');
 
 const mongoose = require("mongoose");
 //const ObjectId = require('mongoose')
 const {
   Types: { ObjectId },
 } = mongoose;
+
+
+
 
 const viewUserProfile = async (req, res) => {
   try {
@@ -23,9 +27,12 @@ const viewUserProfile = async (req, res) => {
     res.render("user/profile", { userData: userDataObject });
   } catch (error) {
     console.log(error.message);
-    res.status(500).send("Internal Server Error");
+    res.status(HttpStatus.InternalServerError).send("Internal Server Error");
   }
 };
+
+
+
 
 const EditUserProfile = async (req, res) => {
   try {
@@ -37,9 +44,12 @@ const EditUserProfile = async (req, res) => {
     res.render("user/editProfile", { userData: userDataObject });
   } catch (error) {
     console.log(error.message);
-    res.status(500).send("Internal Server Error");
+    res.status(HttpStatus.InternalServerError).send("Internal Server Error");
   }
 };
+
+
+
 
 const updateUserProfile = async (req, res) => {
   try {
@@ -69,9 +79,12 @@ const updateUserProfile = async (req, res) => {
     res.redirect("/profile");
   } catch (error) {
     console.log(error.message);
-    res.status(500).send("Internal Server Error");
+    res.status(HttpStatus.InternalServerError).send("Internal Server Error");
   }
 };
+
+
+
 
 const changePassword = async (req, res) => {
   try {
@@ -82,9 +95,12 @@ const changePassword = async (req, res) => {
     res.render("user/changePassword", { userData });
   } catch (error) {
     console.log(error.message);
-    res.status(500).send("Internal Server Error");
+    res.status(HttpStatus.InternalServerError).send("Internal Server Error");
   }
 };
+
+
+
 
 const updatePassword = async (req, res) => {
   try {
@@ -113,9 +129,12 @@ const updatePassword = async (req, res) => {
     }
   } catch (error) {
     console.log(error.message);
-    res.status(500).send("Internal Server Error");
+    res.status(HttpStatus.InternalServerError).send("Internal Server Error");
   }
 };
+
+
+
 
 
 const my_Orders = async (req, res) => {
@@ -174,9 +193,12 @@ const my_Orders = async (req, res) => {
     });
   } catch (error) {
     console.log(error.message);
-    res.status(500).send("Internal Server Error");
+    res.status(HttpStatus.InternalServerError).send("Internal Server Error");
   }
 };
+
+
+
 
 const orderDetails = async (req, res) => {
   try {
@@ -187,16 +209,9 @@ const orderDetails = async (req, res) => {
       const userId = user._id;
       let offerprice=0
 
-
-
-      // Retrieve user data
       const userData = await User.findById(userId).lean();
 
-      // Retrieve order details including populated address
       const myOrderDetails = await Order.findById(orderId).populate('address').lean();
-      // let hasReturnedItems = myOrderDetails.product.some(product => product.isReturned);
-      // let allCancelled = myOrderDetails.product.every(product => product.isCancelled);
-      // let allReturned = myOrderDetails.product.every(product => product.isReturned);
       await myOrderDetails.product.forEach((product) => {
           if (product.isReturned) {
               ct++
@@ -222,24 +237,60 @@ const orderDetails = async (req, res) => {
           }
       }
 
-     // myOrderDetails.allCancelled = allCancelled;
-     // myOrderDetails.allReturned = allReturned;
-
       if (!myOrderDetails) {
           return res.status(404).send("Order not found");
       }
 
-      // Retrieve ordered product details
+      // const orderedProDet = await Order.aggregate([
+      //     { $match: { _id: new mongoose.Types.ObjectId(orderId) } },
+      //     { $unwind: "$product" },
+      //     {
+      //         $project: {
+      //             _id: 1,
+      //             product: 1
+      //         }
+      //     }
+      // ]);
+      
       const orderedProDet = await Order.aggregate([
-          { $match: { _id: new mongoose.Types.ObjectId(orderId) } },
-          { $unwind: "$product" },
-          {
-              $project: {
-                  _id: 1,
-                  product: 1
-              }
-          }
-      ]);
+        { $match: { _id: new mongoose.Types.ObjectId(orderId) } },
+        { $unwind: "$product" },
+        {
+            $lookup: {
+                from: "productoffers", // Collection for product offers
+                localField: "product.productId", // Match the product ID
+                foreignField: "productId",
+                as: "productOffer",
+            },
+        },
+        {
+            $unwind: {
+                path: "$productOffer",
+                preserveNullAndEmptyArrays: true, // Allow products without offers
+            },
+        },
+        {
+            $project: {
+                _id: 1,
+                product: {
+                    name: "$product.name",
+                    image: "$product.image",
+                    quantity: "$product.quantity",
+                    price: "$product.price", // Original price
+                    discountPrice: {
+                        $cond: {
+                            if: { $gt: ["$productOffer.discountPrice", 0] }, // Discount price exists
+                            then: "$productOffer.discountPrice",
+                            else: "$product.price", // Fallback to original price
+                        },
+                    },
+                },
+            },
+        },
+    ]);
+    
+    
+      
       const address=await Address.findOne(
           {
               userId:userId
@@ -248,15 +299,16 @@ const orderDetails = async (req, res) => {
       console.log(address,"address")
 
       console.log("myOrderDetails:", myOrderDetails);
-      //console.log("orderedProDet:", orderedProDet);
       offerprice-=(myOrderDetails.total)
 
       res.render('user/orderDetails', {offerprice, address,orderedProDet, myOrderDetails, userData });
   } catch (error) {
       console.error("Error fetching order details:", error.message);
-      res.status(500).send("Internal Server Error");
+      res.status(HttpStatus.InternalServerError).send("Internal Server Error");
   }
 };
+
+
 
 
 const verify = (req, res) => {
@@ -279,6 +331,9 @@ const verify = (req, res) => {
       res.json({ status: false });
   }
 };
+
+
+
 
 
 const walletpage = async (req, res) => {
@@ -346,38 +401,21 @@ const walletpage = async (req, res) => {
   } catch (error) {
     console.log(error.message);
     console.log(error.message);
-      res.status(500).send("Internal Server Error");
+      res.status(HttpStatus.InternalServerError).send("Internal Server Error");
   }
 }
 
 
-// const retryPayment = async(req, res) =>{
-//   try {
 
-//     const id = req.params.id
-//     console.log("retry pymenyyyyyytt" , id )
-//     await Order.findByIdAndUpdate(id, { $set: { status: 'pending' } }, { new: true });
-
-//       res.json({
-//           razorPaySucess: true,
-//           order
-//       })
-    
-//   } catch (error) {
-    
-//   }
-//  }
 
 const retryPayment = async (req, res) => {
   try {
-      // Get the order ID from the request parameters
+     
       const id = req.params.id;
       console.log("Retry Payment for order ID:", id);
 
-      // Update the order status to 'pending' in the database
       const updatedOrder = await Order.findByIdAndUpdate(id, { $set: { status: 'pending' } }, { new: true });
 
-      // Check if the order exists and was updated successfully
       if (!updatedOrder) {
           return res.status(404).json({
               success: false,
@@ -385,21 +423,21 @@ const retryPayment = async (req, res) => {
           });
       }
 
-      // If the update is successful, return a success response
       res.json({
           success: true,
           message: "Payment status has been set to 'pending'. You can retry the payment.",
           order: updatedOrder
       });
   } catch (error) {
-      // Catch any errors and send an error response
+      
       console.error("Error updating payment status:", error);
-      res.status(500).json({
+      res.status(HttpStatus.InternalServerError).json({
           success: false,
           message: "An error occurred while retrying the payment. Please try again later."
       });
   }
 };
+
 
 
 module.exports = {

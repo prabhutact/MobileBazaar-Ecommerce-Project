@@ -1,9 +1,12 @@
-const Category = require("../../model/categoryModel");
-const Product = require("../../model/productModel");
-const User = require("../../model/userModel");
+const Category = require("../../model/categorySchema");
+const Product = require("../../model/productSchema");
+const User = require("../../model/userSchema");
 const mongoose = require("mongoose");
+const HttpStatus = require('../../httpStatus');
 
-let userData;
+
+
+
 
 const getProduct = async (req, res) => {
   try {
@@ -62,9 +65,14 @@ const getProduct = async (req, res) => {
     });
   } catch (error) {
     console.log(error.message);
-    res.status(500).send("Internal Server Error");
+    res.status(HttpStatus.InternalServerError).send("Internal Server Error");
   }
 };
+
+
+
+
+
 
 const searchAndSort = async (req, res) => {
   const { searchQuery, sortOption, categoryFilter, page, limit } = req.body;
@@ -106,7 +114,7 @@ const searchAndSort = async (req, res) => {
   const limitStage = { $limit: limit };
 
   const products = await Product.aggregate([
-    matchStage, // Assuming this is the initial matching stage
+    matchStage, 
     {
       $lookup: {
         from: "categories",
@@ -118,21 +126,21 @@ const searchAndSort = async (req, res) => {
     {
       $unwind: {
         path: "$category",
-        preserveNullAndEmptyArrays: true, // Ensure products without categories are still included
+        preserveNullAndEmptyArrays: true, 
       },
     },
     {
       $lookup: {
-        from: "productoffers",  // Lookup with productoffers collection
-        localField: "_id",  // Product's ID field
-        foreignField: "productId",  // Field in productoffers referencing Product
+        from: "productoffers",  
+        localField: "_id",  
+        foreignField: "productId",  
         as: "productOffer",
       },
     },
     {
       $unwind: {
         path: "$productOffer",
-        preserveNullAndEmptyArrays: true, // Ensure products without offers are still included
+        preserveNullAndEmptyArrays: true, 
       },
     },
     {
@@ -152,19 +160,19 @@ const searchAndSort = async (req, res) => {
           isListed: 1,
           bestSelling: 1,
         },
-        productOffer: 1,  // Include all fields from the productOffer
+        productOffer: 1,  
         discountPrice: {
           $cond: {
-            if: { $eq: ["$productOffer.currentStatus", true] },  // If currentStatus is true
-            then: "$productOffer.discountPrice",  // Show discountPrice if offer is active
-            else: "$price",  // Otherwise, show price as discountPrice
+            if: { $eq: ["$productOffer.currentStatus", true] },  
+            then: "$productOffer.discountPrice",  
+            else: "$price",  
           },
         },
       },
     },
-    sortStage, // Sorting stage
-    skipStage, // Skipping stage for pagination
-    limitStage, // Limit stage for pagination
+    sortStage, 
+    skipStage, 
+    limitStage, 
   ]);
   
   console.log(products);
@@ -174,6 +182,10 @@ const searchAndSort = async (req, res) => {
 
   res.json({ products, totalProducts });
 };
+
+
+
+
 module.exports = {
   getProduct,
   searchAndSort

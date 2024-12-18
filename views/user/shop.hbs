@@ -204,10 +204,10 @@ const productHtml = `
                 </div>
                 <div class="product-price">
                     ${
-                        product.discountPrice
+                        product.discountPrice && product.discountPrice < product.price
                             ? `<span>₹${product.discountPrice}</span>
-                               <span class="old-price">₹${product.price}</span>`
-                            : `<span>₹${product.price}</span>`
+                               <span class="old-price">₹${product.price}</span>` // Show both if discount exists
+                            : `<span>₹${product.price}</span>` // Show only price if no discount
                     }
                 </div>
                 <div class="product-action-1 show">

@@ -1,11 +1,13 @@
 const moment = require('moment');
-const Sale = require("../../model/orderModel");
-const Order = require("../../model/orderModel");
+const Sale = require("../../model/orderSchema");
+const Order = require("../../model/orderSchema");
 const PDFDocument = require('pdfkit');
 const hbs = require('hbs');
 const Handlebars = require('handlebars');
-const Product = require("../../model/productModel");
-const Category = require("../../model/categoryModel");
+const Product = require("../../model/productSchema");
+const Category = require("../../model/categorySchema");
+const HttpStatus = require('../../httpStatus');
+
 
 let months = [];
 let odersByMonth = [];
@@ -63,8 +65,6 @@ const loadDashboard = async (req, res) => {
 
         const sales = await Sale.find({}).lean();
 
-        // console.log(sales, 'salessssssssssssssssss');
-
         const salesByMonth = {};
 
         sales.forEach((sale) => {
@@ -107,9 +107,6 @@ const loadDashboard = async (req, res) => {
             totalSales += Number(data.totalOrders);
         });
 
-        // const thisMonthOrder = odersByMonth[odersByMonth.length - 1];
-        // const thisMonthSales = revnueByMonth[revnueByMonth.length - 1];
-
         const thisMonthOrder = odersByMonth.length > 0 ? odersByMonth[odersByMonth.length - 1] : 0;
         const thisMonthSales = revnueByMonth.length > 0 ? revnueByMonth[revnueByMonth.length - 1] : 0;
 
@@ -117,13 +114,6 @@ const loadDashboard = async (req, res) => {
         let popuarProducts = await Product.find().sort({ popularity: -1 }).limit(5).lean();
         let bestSellingCategory = await Category.find().sort({ bestSelling: -1 }).limit(5).lean();
 
-        // console.log(thisMonthOrder, thisMonthSales);
-
-        // console.log(months);
-        // console.log(odersByMonth);
-        // console.log(revnueByMonth);
-        // console.log(totalRevnue);
-        // console.log(totalSales);
 
         res.render('admin/dashBoard', {
             categoryCount,
@@ -142,9 +132,11 @@ const loadDashboard = async (req, res) => {
         });
     } catch (error) {
         console.error('Error loading dashboard:', error);
-        res.status(500).send('Internal Server Error');
+        res.status(HttpStatus.InternalServerError).send('Internal Server Error');
     }
 };
+
+
 
 const getSales = async (req, res) => {
     const { stDate, edDate } = req.query;
@@ -186,13 +178,7 @@ const getSales = async (req, res) => {
             grandTotal += element.total;
         });
 
-        // let grandTotal = 0;
-
         const salesCount = salesData.length;
-
-        // salesData.forEach(element => {
-        //     grandTotal += element.total;
-        // });
 
         console.log(grandTotal);
 
@@ -203,9 +189,11 @@ const getSales = async (req, res) => {
         });
     } catch (error) {
         console.error('Error fetching sales:', error);
-        res.status(500).send('Internal Server Error');
+        res.status(HttpStatus.InternalServerError).send('Internal Server Error');
     }
 };
+
+
 
 const getChartData = (req, res) => {
     try {
@@ -218,7 +206,7 @@ const getChartData = (req, res) => {
         });
     } catch (error) {
         console.error('Error fetching chart data:', error);
-        res.status(500).send('Internal Server Error');
+        res.status(HttpStatus.InternalServerError).send('Internal Server Error');
     }
 };
 

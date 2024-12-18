@@ -1,5 +1,6 @@
-const User = require("../../model/userModel");
+const User = require("../../model/userSchema");
 const Razorpay = require("razorpay")
+const HttpStatus = require('../../httpStatus');
 
 require('dotenv').config();
 
@@ -7,6 +8,10 @@ let instance = new Razorpay({
     key_id: process.env.KEY_ID,
     key_secret: process.env.KEY_SECRET
 })
+
+
+
+
 
 let addMoneyToWallet = async (req, res) => {
     try {
@@ -53,10 +58,13 @@ let addMoneyToWallet = async (req, res) => {
 
     } catch (error) {
         console.log("Something went wrong", error);
-        res.status(500).send("Internal Server Error");
+        res.status(HttpStatus.InternalServerError).send("Internal Server Error");
 
     }
 }
+
+
+
 
 const verifyPayment = async (req, res) => {
     try {
@@ -81,9 +89,10 @@ const verifyPayment = async (req, res) => {
         })
     } catch (error) {
         console.log("Something went wrong", error);
-        res.status(500).send("Internal Server Error");
+        res.status(HttpStatus.InternalServerError).send("Internal Server Error");
     }
 }
+
 
 
 module.exports = {

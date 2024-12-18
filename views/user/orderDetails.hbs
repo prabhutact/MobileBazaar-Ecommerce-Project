@@ -112,10 +112,23 @@
                                                                         <div class="info">{{this.product.name}}</div>
                                                                     </a>
                                                                 </td>
-                                                                <td> ₹{{this.product.price}} </td>
+                                                                {{!-- <td> ₹{{this.product.price}} </td>
                                                                 <td>{{this.product.quantity}} </td>
                                                                 <td>₹{{multiply this.product.quantity
-                                                                    this.product.price }}</td>
+                                                                    this.product.price }}</td> --}}
+
+                                                                     <td>
+        <!-- Display discount price if available, otherwise show the original price -->
+        ₹{{#if this.product.discountPrice}}{{this.product.discountPrice}}{{else}}{{this.product.price}}{{/if}}
+    </td>
+    <td>{{this.product.quantity}}</td>
+    <td>
+        <!-- Multiply quantity with either discount price or original price -->
+        ₹{{#if this.product.discountPrice}}
+            {{multiply this.product.quantity this.product.discountPrice}}
+        {{else}}
+            {{multiply this.product.quantity this.product.price}}
+        {{/if}}
                                                                 
 
                                                                 <td class="text-end">                                                                    

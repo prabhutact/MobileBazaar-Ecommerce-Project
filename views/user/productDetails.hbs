@@ -38,24 +38,28 @@
                                 <div class="detail-info">
                                     <h2 class="title-detail">{{product.name}}</h2>
                                      {{!-- <input name="product_name" value="{{product.name}}" type="hidden">                                     --}}
-                                    <div class="clearfix product-price-cover">
-                                        <div class="product-price primary-color float-left">
-                                            {{#if product.productOffer.discountPrice}}
-    <div class="product-price">
-        <span class="text-brand">₹{{product.productOffer.discountPrice}}</span>
-        <ins><span class="old-price font-md ml-15">₹{{product.price}}</span></ins>
-        {{#if product.productOffer.discountPrice}}
-            <span class="save-price font-md color3 ml-15">{{product.productOffer.productOfferPercentage}}% Off</span>
-        {{/if}}
-    </div>
-{{else}}
-    <div class="product-price">
+   <div class="clearfix product-price-cover">
+  <div class="product-price primary-color float-left">
+    {{#if product.productOffer}} <!-- Check if productOffer exists -->
+      {{#if product.productOffer.discountPrice}} <!-- Check if discountPrice exists -->
+        <div class="product-price">
+          <span class="text-brand">₹{{product.productOffer.discountPrice}}</span>
+          <ins><span class="old-price font-md ml-15">₹{{product.price}}</span></ins>
+          <span class="save-price font-md color3 ml-15">{{product.productOffer.productOfferPercentage}}% Off</span>
+        </div>
+      {{else}} <!-- If discountPrice does not exist -->
+        <div class="product-price">
+          <span class="text-brand">₹{{product.price}}</span>
+        </div>
+      {{/if}}
+    {{else}} <!-- If productOffer does not exist -->
+      <div class="product-price">
         <span class="text-brand">₹{{product.price}}</span>
-    </div>
-{{/if}}
+      </div>
+    {{/if}}
+  </div>
+</div>
 
-                                        </div>
-                                    </div>
                                     <div class="bt-1 border-color-1 mt-15 mb-15"></div>
                                     <div class="short-desc mb-30">
                                         <p>{{product.description}}</p>

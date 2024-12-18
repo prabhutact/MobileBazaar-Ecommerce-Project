@@ -1,45 +1,35 @@
-const Product = require("../../model/productModel");
-const User = require("../../model/userModel");
-const { Address } = require("../../model/addressSchema");
+const Product = require("../../model/productSchema");
+const User = require("../../model/userSchema");
+const Address = require("../../model/addressSchema");
 const Coupon = require('../../model/couponSchema')
-const Order = require("../../model/orderModel");
+const Order = require("../../model/orderSchema");
 const moment = require('moment')
 const easyinvoice = require('easyinvoice');
 const mongoose = require('mongoose')
+const HttpStatus = require('../../httpStatus');
 
 
-// const payment_failed = (req, res) => {
-//     try {
-//       const userData = req.session.user
-//         res.render('user/paymentFailed', {userData})
-//     } catch (error) {
-//         console.log(error);
-//     }
-//   }
-  
+
 
 const payment_failed = (req, res) => {
     try {
-        const userData = req.session.user;  // Get user data from session
-        const { error, payment_method, order_id } = req.query;  // Get the error details, payment method, and order ID from the query params
+        const userData = req.session.user;  
+        const { error, payment_method, order_id } = req.query;  
 
-        // Log the error for debugging purposes (you can also save this to a log file or database if needed)
-        console.error("Payment failed for order:", order_id);
-        console.error("Error details:", error);
-
-        // Render the payment failed page with additional error details
         res.render('user/paymentFailed', {
             userData,
-            error,            // Send the error object received from Razorpay
-            payment_method,   // Send the payment method used (like "razorpay", "cash-on-delivery", etc.)
-            order_id,         // Send the order ID that failed
+            error,            
+            payment_method,  
+            order_id,       
             message: 'Your payment attempt failed. Please try again or choose another payment method.'
         });
     } catch (error) {
         console.log("Error in payment_failed route:", error);
-        res.status(500).send("Internal Server Error");
+        res.status(HttpStatus.InternalServerError).send("Internal Server Error");
     }
 }
+
+
 
 
 const cancelOrder = async (req, res) => {
@@ -48,7 +38,7 @@ const cancelOrder = async (req, res) => {
         console.log(id);
 
         if (!mongoose.Types.ObjectId.isValid(id)) {
-            return res.status(400).json({ error: 'Invalid order ID' });
+            return res.status(HttpStatus.BadRequest).json({ error: 'Invalid order ID' });
         }
 
         const ID = new mongoose.Types.ObjectId(id);
@@ -57,7 +47,7 @@ const cancelOrder = async (req, res) => {
         let canceledOrder = await Order.findOne({ _id: ID });
 
         if (!canceledOrder) {
-            return res.status(404).json({ error: 'Order not found' });
+            return res.status(HttpStatus.NotFound).json({ error: 'Order not found' });
         }
 
         await Order.updateOne({ _id: ID }, { $set: { status: 'Cancelled' } });
@@ -111,9 +101,12 @@ const cancelOrder = async (req, res) => {
         });
     } catch (error) {
         console.log(error.message);
-        res.status(500).send('Internal Server Error');
+        res.status(HttpStatus.InternalServerError).send('Internal Server Error');
     }
 };
+
+
+
 
 // Return entire order
 const returnOrder = async (req, res) => {
@@ -144,14 +137,21 @@ const returnOrder = async (req, res) => {
 
 
         }
+
+        let couponAmountEach = 0
+        if(returnedOrder.coupon){
+            couponAmountEach = returnedOrder.discountAmt / returnedOrder.product.length
+
+        }
+
         if (['wallet', 'razorpay'].includes(returnedOrder.paymentMethod)) {
             for (const data of returnedOrder.product) {
                 //await Product.updateOne({ _id: data._id }, { $inc: { stock: data.quantity } });
                 await User.updateOne(
                     { _id: req.session.user._id },
-                    { $inc: { wallet: data.price * data.quantity } }
+                    { $inc: { wallet: (data.price * data.quantity) - couponAmountEach } }
                 );
-                notCancelledAmt += data.price * data.quantity;
+                notCancelledAmt += data.price * data.quantity - couponAmountEach;
             }
 
             await User.updateOne(
@@ -175,9 +175,103 @@ const returnOrder = async (req, res) => {
         });
     } catch (error) {
         console.log(error.message);
-        res.status(500).send('Internal Server Error');
+        res.status(HttpStatus.InternalServerError).send('Internal Server Error');
     }
 };
+
+
+// const returnOrder = async (req, res) => {
+//     try {
+//         const id = req.params.id;
+        
+//         if (!mongoose.Types.ObjectId.isValid(id)) {
+//             return res.status(400).json({ error: 'Invalid order ID' });
+//         }
+//         const ID = new mongoose.Types.ObjectId(id);
+//         let notCancelledAmt = 0;
+
+        
+//         let returnedOrder = await Order.findOne({ _id: ID }).lean();
+//         console.log(returnedOrder, "returnedOrder");
+
+        
+//         const returnedorder = await Order.findByIdAndUpdate(ID, { $set: { status: 'Returned' } }, { new: true });
+
+        
+//         for (const data of returnedorder.product) {
+//             if (!data.isCancelled) {
+               
+//                 await Product.updateOne(
+//                     { _id: data._id },
+//                     { $inc: { stock: data.quantity } }
+//                 );
+
+//                 // Mark the product as returned in the order
+//                 await Order.updateOne(
+//                     { _id: ID, 'product._id': data._id },
+//                     { $set: { 'product.$.isReturned': true } }
+//                 );
+
+//                 let refundAmount = 0;
+
+                
+//                 if (data.couponUsed) {
+                    
+//                     const coupon = await Coupon.findOne({ code: data.coupon });
+//                     if (coupon) {
+                        
+//                         const discountAmt = (data.price * coupon.discount) / 100;
+                        
+//                         refundAmount = (data.amountAfterDscnt || (data.price - discountAmt)) * data.quantity;
+//                     }
+//                 } else {
+                    
+//                     refundAmount = data.price * data.quantity;
+//                 }
+
+//                 // If the payment method is 'wallet' or 'razorpay', update the user's wallet
+//                 if (['wallet', 'razorpay'].includes(returnedOrder.paymentMethod)) {
+    
+//                     await User.updateOne(
+//                         { _id: req.session.user._id },
+//                         { $inc: { wallet: refundAmount } }
+//                     );
+
+                   
+//                     notCancelledAmt += refundAmount;
+//                 }
+//             }
+//         }
+
+        
+//         await User.updateOne(
+//             { _id: req.session.user._id },
+//             {
+//                 $push: {
+//                     history: {
+//                         amount: notCancelledAmt,
+//                         status: 'refund of Order Return',
+//                         date: Date.now()
+//                     }
+//                 }
+//             }
+//         );
+
+        
+//         res.json({
+//             success: true,
+//             message: 'Successfully Returned Order'
+//         });
+
+//     } catch (error) {
+//         console.log(error.message);
+//         res.status(HttpStatus.InternalServerError).send('Internal Server Error');
+//     }
+// };
+
+
+
+
 
 // Cancel one product in an order
 const cancelOneProduct = async (req, res) => {
@@ -186,7 +280,7 @@ const cancelOneProduct = async (req, res) => {
         console.log(id, prodId)
 
         if (!mongoose.Types.ObjectId.isValid(id) || !mongoose.Types.ObjectId.isValid(prodId)) {
-            return res.status(400).json({ error: 'Invalid order or product ID' });
+            return res.status(HttpStatus.BadRequest).json({ error: 'Invalid order or product ID' });
         }
 
         const ID = new mongoose.Types.ObjectId(id);
@@ -199,7 +293,7 @@ const cancelOneProduct = async (req, res) => {
         ).lean();
 
         if (!updatedOrder) {
-            return res.status(404).json({ error: 'Order or product not found' });
+            return res.status(HttpStatus.NotFound).json({ error: 'Order or product not found' });
         }
 
         const result = await Order.findOne(
@@ -261,16 +355,21 @@ const cancelOneProduct = async (req, res) => {
         });
     } catch (error) {
         console.log(error.message);
-        res.status(500).send('Internal Server Error');
+        res.status(HttpStatus.InternalServerError).send('Internal Server Error');
     }
 };
+
+
+
+
+
 const returnOneProduct = async (req, res) => {
     try {
         const { id, prodId } = req.body;
         console.log(id, prodId)
 
         if (!mongoose.Types.ObjectId.isValid(id) || !mongoose.Types.ObjectId.isValid(prodId)) {
-            return res.status(400).json({ error: 'Invalid order or product ID' });
+            return res.status(HttpStatus.BadRequest).json({ error: 'Invalid order or product ID' });
         }
 
         const ID = new mongoose.Types.ObjectId(id);
@@ -283,7 +382,7 @@ const returnOneProduct = async (req, res) => {
         ).lean();
 
         if (!updatedOrder) {
-            return res.status(404).json({ error: 'Order or product not found' });
+            return res.status(HttpStatus.NotFound).json({ error: 'Order or product not found' });
         }
 
         const result = await Order.findOne(
@@ -345,16 +444,21 @@ const returnOneProduct = async (req, res) => {
         });
     } catch (error) {
         console.log(error.message);
-        res.status(500).send('Internal Server Error');
+        res.status(HttpStatus.InternalServerError).send('Internal Server Error');
     }
 }
+
+
+
+
+
 const getInvoice = async (req, res) => {
     try {
         const orderId = req.query.id;
         const order = await Order.findById(orderId);
 
         if (!order) {
-            return res.status(404).send({ message: 'Order not found' });
+            return res.status(HttpStatus.NotFound).send({ message: 'Order not found' });
         }
 
         const { userId, address: addressId } = order;
@@ -364,7 +468,7 @@ const getInvoice = async (req, res) => {
         ]);
 
         if (!user || !address) {
-            return res.status(404).send({ message: 'User or address not found' });
+            return res.status(HttpStatus.NotFound).send({ message: 'User or address not found' });
         }
 
         const products = order.product.map((product) => ({
@@ -375,10 +479,10 @@ const getInvoice = async (req, res) => {
         }));
 
         products.push({
-            quantity: '1', // Delivery charge is a single charge
+            quantity: '1', 
             description: 'Delivery Charge',
-            tax: 0, // Assuming no tax for delivery charge
-            price: 50, // 50 INR delivery charge
+            tax: 0, 
+            price: 50, 
         });
         
         const date = moment(order.date).format('MMMM D, YYYY');
@@ -423,9 +527,10 @@ const getInvoice = async (req, res) => {
 
     } catch (error) {
         console.error('Error generating invoice:', error);
-        res.sendStatus(500);
+        res.status(HttpStatus.InternalServerError).send('Internal Server Error');
     }
 };
+
 
 
 module.exports = {

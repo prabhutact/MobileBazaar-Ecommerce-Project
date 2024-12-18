@@ -1,18 +1,19 @@
+const HttpStatus = require('../../httpStatus');
 
-// Get Login Page
 
+// Load Login Page
 const getLogin = async (req, res) => {
   try {
     res.render("admin/login", { layout: "adminLayout", isLoginPage: true });
   } catch (error) {
-    console.log(error);
+    console.log(error.message);
+    res.status(HttpStatus.InternalServerError).json({ message: "Something went wrong"});
   }
 };
 
 
 
 // Login
-
 const doLogin = async (req, res) => {
   try {
     const admin = {
@@ -22,6 +23,7 @@ const doLogin = async (req, res) => {
 
     let adminMail = req.body.email;
     let adminPass = req.body.password;
+
     if (admin.mail === adminMail && admin.password === adminPass) {
       req.session.admin = admin;
       console.log(req.session)
@@ -34,7 +36,8 @@ const doLogin = async (req, res) => {
       });
     }
   } catch (error) {
-    console.log(error);
+    console.log(error.message);
+    res.status(HttpStatus.InternalServerError).send("InternalServerError");
   }
 };
 
@@ -46,7 +49,8 @@ const doLogout = async (req, res) => {
     req.session.admin = null;    
     res.redirect("/admin/login");
   } catch (error) {
-    console.log(error);
+    console.log(error.message);
+    res.status(HttpStatus.InternalServerError).send("InternalServerError");
   }
 };
 

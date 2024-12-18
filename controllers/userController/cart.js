@@ -1,6 +1,10 @@
-const Cart = require("../../model/cartModel");
-const Product = require("../../model/productModel");
+const Cart = require("../../model/cartSchema");
+const Product = require("../../model/productSchema");
 const mongoose = require("mongoose");
+const HttpStatus = require('../../httpStatus');
+
+
+
 
 const loadCartPage = async (req, res) => {
   try {
@@ -24,13 +28,13 @@ const loadCartPage = async (req, res) => {
       {
         $unwind: {
           path: "$productData",
-          preserveNullAndEmptyArrays: true, // To keep cart entries even if no matching product
+          preserveNullAndEmptyArrays: true, 
         },
       },
       {
         $lookup: {
-          from: "productoffers", // Lookup product offers
-          localField: "productData._id", // Match the product ID
+          from: "productoffers", 
+          localField: "productData._id",
           foreignField: "productId",
           as: "productOffer",
         },
@@ -38,7 +42,7 @@ const loadCartPage = async (req, res) => {
       {
         $unwind: {
           path: "$productOffer",
-          preserveNullAndEmptyArrays: true, // To keep cart entries even if no active offer
+          preserveNullAndEmptyArrays: true, 
         },
       },
       {
@@ -50,9 +54,9 @@ const loadCartPage = async (req, res) => {
           productName: "$productData.name",
           productPrice: {
             $cond: {
-              if: { $gt: [{ $ifNull: ["$productOffer.discountPrice", 0] }, 0] }, // Check if discountPrice exists
-              then: "$productOffer.discountPrice", // Use discountPrice if available
-              else: "$productData.price", // Otherwise use regular price
+              if: { $gt: [{ $ifNull: ["$productOffer.discountPrice", 0] }, 0] }, 
+              then: "$productOffer.discountPrice", 
+              else: "$productData.price", 
             },
           },
           productDescription: "$productData.description",
@@ -62,11 +66,6 @@ const loadCartPage = async (req, res) => {
       },
     ]);
     
-    console.log(cartProd);
-    
-    
-    console.log(cartProd);
-
     cartProd = cartProd.map(item => {
       if (item.stock <= 0) {
         item.outOfStock = true; 
@@ -107,21 +106,24 @@ const loadCartPage = async (req, res) => {
     }
   } catch (error) {
     console.log(error.message);
-    res.status(500).send("Internal Server Error");
+    res.status(HttpStatus.InternalServerError).send("Internal Server Error");
   }
 };
+
+
+
+
 
 const addToCart = async (req, res) => {
   try {
     let userData = req.session.user;
     if (!userData) {
-      console.log("userdata..............");
+      console.log("User data not found...");
       return res
-        .status(401)
+        .status(HttpStatus.Unauthorized)
         .json({ success: false, message: "Login Required" });
     }
 
-    console.log("User ID:", userData._id);
     const data = req.body;
     console.log("Request Body:", data);
     const quantity = parseInt(req.body.quantity, 10);
@@ -129,7 +131,7 @@ const addToCart = async (req, res) => {
 
     if (!data.prodId) {
       return res
-        .status(400)
+        .status(HttpStatus.BadRequest)
         .json({ success: false, message: "Invalid product ID" });
     }
 
@@ -141,36 +143,32 @@ const addToCart = async (req, res) => {
     }
 
     const productToLookup = await Product.aggregate([
-      { $match: { _id: new mongoose.Types.ObjectId(data.prodId) } }, // Find product by ID
+      { $match: { _id: new mongoose.Types.ObjectId(data.prodId) } }, 
       {
         $lookup: {
-          from: "productoffers", // The name of the collection you want to join
-          localField: "_id", // The field in the Product collection
-          foreignField: "productId", // The field in the ProductOffer collection that references Product
-          as: "productOffer", // The field where the joined data will be stored
+          from: "productoffers", 
+          localField: "_id", 
+          foreignField: "productId", 
+          as: "productOffer", 
         },
       },
       {
-        $unwind: { 
-          path: "$productOffer", // Unwind to access individual offer data
-          preserveNullAndEmptyArrays: true, // Keep product even if there's no offer
+        $unwind: {
+          path: "$productOffer", 
+          preserveNullAndEmptyArrays: true, 
         },
-      }
+      },
     ]);
-    let productToCart = productToLookup[0]
-    console.log(productToCart);
-    
 
-    const priceToUse = productToCart.productOffer.discountPrice || productToCart.price; 
-    console.log("priceToUse =>     ",priceToUse)
+    if (!productToLookup || productToLookup.length === 0) {
+      return res.status(HttpStatus.NotFound).json({ success: false, message: "Product not found" });
+    }
 
+    let productToCart = productToLookup[0];
     console.log("Product Data:", productToCart);
 
-    if (!productToCart) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Product not found" });
-    }
+    const priceToUse = productToCart.productOffer?.discountPrice || productToCart.price;
+    console.log("priceToUse => ", priceToUse);
 
     const ProductExist = await Cart.find({
       userId: userData._id,
@@ -208,15 +206,16 @@ const addToCart = async (req, res) => {
         cartItem: cartData,
       });
     } else {
-      res
-        .status(500)
-        .json({ success: false, message: "Failed to add product to cart" });
+      res.status(HttpStatus.InternalServerError).json({ success: false, message: "Failed to add product to cart" });
     }
   } catch (error) {
-    console.log(error.message);
-    res.status(500).send("Internal Server Error");
+    console.log("Error:", error.message);
+    res.status(HttpStatus.InternalServerError).send("Internal Server Error");
   }
 };
+
+
+
 
 const removeFromCart = async (req, res) => {
   try {
@@ -230,9 +229,12 @@ const removeFromCart = async (req, res) => {
     }
   } catch (error) {
     console.log(error.message);
-    res.status(500).send("Internal Server Error");
+    res.status(HttpStatus.InternalServerError).send("Internal Server Error");
   }
 };
+
+
+
 
 const updateCart = async (req, res) => {
   try {
@@ -254,13 +256,6 @@ const updateCart = async (req, res) => {
       cartquant.stock,
       "cartquant--------------------------------------------------------------"
     );
-
-    // if (req.body.newValue > 4) {
-    //   return res.json({
-    //     success: false,
-    //     message: "You can only choose up to 4 units of this product.",
-    //   });
-    // }
 
     if (req.body.newValue > cartquant.stock) {
       return res.json({
@@ -302,17 +297,11 @@ const updateCart = async (req, res) => {
 
     updatedCart.forEach((data) => {
       const newDataItem = { ...data };
-
-      // if (data.totalAmount) {
-      //   newDataItem.totalAmount = newValue;
-      // } else {
-      //   newDataItem.totalAmount = newValue;
-      // }
+      
       if (data.stock <= 0) {
     newDataItem.totalAmount = "Out of Stock";  
     newDataItem.outOfStock = true; 
   } else {
-    // Calculate the total amount if the product is in stock
     newDataItem.totalAmount = newValue;
   }
 
@@ -332,9 +321,10 @@ const updateCart = async (req, res) => {
     console.log(newData[0].totalAmount);
   } catch (error) {
     console.log(error.message);
-    res.status(500).send("Internal Server Error");
+    res.status(HttpStatus.InternalServerError).send("Internal Server Error");
   }
 };
+
 
 
 
@@ -371,9 +361,11 @@ const checkOutOfStock = async (req, res) => {
 
   } catch (error) {
     console.log(error.message);
-    res.status(500).send("Internal Server Error");
+    res.status(HttpStatus.InternalServerError).send("Internal Server Error");
   }
 };
+
+
 
 module.exports = {
   loadCartPage,

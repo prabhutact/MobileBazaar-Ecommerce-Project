@@ -160,14 +160,15 @@
                         <span>90%</span>
                       </span>
                     </div>
-                    <div class="product-price">
-                  {{#if discountPrice}}
-                    <span>₹{{discountPrice}}</span>
-                    <ins><span class="old-price font-md ml-15">₹{{price}}</span></ins>
-                  {{else}}
-                    <span>₹{{price}}</span>
-                  {{/if}}
-                    </div>
+                   <div class="product-price">
+  {{#if discountPrice}}
+    <span>₹{{discountPrice}}</span> <!-- Show the discounted price -->
+    <ins><span class="old-price font-md ml-15">₹{{price}}</span></ins> <!-- Show the original price with strikethrough -->
+  {{else}}
+    <span>₹{{price}}</span> <!-- Show only the original price if there's no discount -->
+  {{/if}}
+</div>
+
                     <div class="product-action-1 show">
                       <a aria-label="Add To Cart" class="action-btn hover-up" href="shop-cart.html"><i class="fi-rs-shopping-bag-add"></i></a>
                     </div>

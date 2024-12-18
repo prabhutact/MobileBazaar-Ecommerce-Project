@@ -1,5 +1,5 @@
 const { compareSync } = require('bcrypt')
-const User = require('../model/userModel')
+const User = require('../model/userSchema')
 
 const logedin = async (req, res, next) => {
     try {

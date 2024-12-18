@@ -7,7 +7,7 @@
             <div class="col-lg-8 mt-5 justify-content-center">
                 <div class="card">
                     <div class="card-body">
-                        {{#if couponMsg}}
+                        {{!-- {{#if couponMsg}}
                         <div class="alert alert-success mt-3 alert-dismissible fade {{#if couponMsg}}show{{/if}}" role="alert">
                             {{couponMsg}}
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -18,7 +18,7 @@
                             {{couponExMsg}}
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
-                        {{/if}}
+                        {{/if}} --}}
                         {{!-- <form action="/admin/add_coupon" method="post" onsubmit="return validationf(this)" class="row g-3">
                             <h5 class="content-title">Add New Coupon</h5>
                             <div class="col-12">
@@ -124,6 +124,42 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.10/dist/sweetalert2.min.js"></script>
 
 <script>
+
+    $(document).ready(function () {
+        $('#addProductOfferForm').on('submit', function (e) {
+            e.preventDefault(); 
+
+            const formData = $(this).serialize(); 
+
+            $.ajax({
+                url: '/admin/addProOffers',
+                type: 'POST',
+                data: formData,
+                success: function (response) {
+                    Swal.fire({
+                        title: "Success!",
+                        text: response.message,
+                        icon: "success",
+                        confirmButtonText: "OK"
+                    }).then(() => {
+                        window.location.href = "/admin/productOffers"; 
+                    });
+                },
+                error: function (xhr) {
+                    const errorMessage = xhr.responseJSON?.message || "Something went wrong!";
+                    Swal.fire({
+                        title: "Error!",
+                        text: errorMessage,
+                        icon: "error",
+                        confirmButtonText: "OK"
+                    });
+                }
+            });
+        });
+    });
+
+
+
 
     $(document).ready(function () {
         $('#backbutton').click(function (e) {

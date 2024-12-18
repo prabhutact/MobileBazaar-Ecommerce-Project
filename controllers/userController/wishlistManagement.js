@@ -1,8 +1,9 @@
-const Cart = require("../../model/cartModel");
-const Product = require("../../model/productModel");
-const Category = require("../../model/categoryModel");
-const User = require("../../model/userModel");
+const Cart = require("../../model/cartSchema");
+const Product = require("../../model/productSchema");
+const Category = require("../../model/categorySchema");
+const User = require("../../model/userSchema");
 const Wishlist = require('../../model/wishlistSchema')
+const HttpStatus = require('../../httpStatus');
 
 const mongoose = require("mongoose");
 const ObjectId = require("mongoose");
@@ -10,6 +11,10 @@ const ObjectId = require("mongoose");
 const swal = require('sweetalert2')
 
 let userData
+
+
+
+
 const showWishlistPage = async (req, res) => {
     const userData = req.session.user;
 
@@ -63,16 +68,17 @@ const showWishlistPage = async (req, res) => {
         }
     } catch (error) {
         console.log(error.message);
-        res.status(500).send("Internal Server Error");
+        res.status(HttpStatus.InternalServerError).send("Internal Server Error");
     }
 };
+
+
+
 
 const addToWishList = async (req, res) => {
     try {
         let { id } = (req.body)
-        // const Id = id.toString()
         const userId = req.session.user
-        // console.log(Id)
         let productData = await Product.findById(id).lean()
         console.log(productData._id)
         const productId = new mongoose.Types.ObjectId(id);
@@ -104,16 +110,18 @@ const addToWishList = async (req, res) => {
         console.log(wishlistData)
     } catch (error) {
         console.log(error.message);
-        res.status(500).send("Internal Server Error");
+        res.status(HttpStatus.InternalServerError).send("Internal Server Error");
     }
 
 }
+
+
+
+
 const removeFromWishList = async (req, res) => {
     try {
         let { id, wishId } = req.body
         console.log(id, wishId)
-
-
 
         let productIdToRemove = new mongoose.Types.ObjectId(id);
         const wishListId = new mongoose.Types.ObjectId(wishId);
@@ -132,10 +140,12 @@ const removeFromWishList = async (req, res) => {
         
     } catch (error) {
         console.log(error.message);
-        res.status(500).send("Internal Server Error");
+        res.status(HttpStatus.InternalServerError).send("Internal Server Error");
     }
 
 }
+
+
 
 module.exports = {
     showWishlistPage,

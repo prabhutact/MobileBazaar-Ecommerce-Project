@@ -1,19 +1,19 @@
-const Category = require("../../model/categoryModel");
+const Category = require("../../model/categorySchema");
 const fs = require("fs");
 const path = require("path");
-const Product = require("../../model/productModel");
-const productModel = require("../../model/productModel");
+const Product = require("../../model/productSchema");
 const HttpStatus = require('../../httpStatus');
 
-// Get Category Page
 
+
+// Load Category Page
 const showCategoryPage = async (req, res) => {
   try {
-    var page = 1;
+    let page = 1;
     if (req.query.page) {
       page = req.query.page;
     }
-    let limit = 3;
+    const limit = 2;
     const category = await Category.find({})
       .skip((page - 1) * limit)
       .limit(limit * 1)
@@ -28,15 +28,18 @@ const showCategoryPage = async (req, res) => {
       category,
       layout: "adminlayout",
     });
-  } catch (error) {}
+  } catch (error) {
+    console.log(error.message);
+    res.status(HttpStatus.InternalServerError).send("Internal Server Error");
+  }
 };
 
-// Get Add Category Page
 
+//Load Add Category Page
 const addCategoryPage = (req, res) => {
   try {
-    let catExistMsg = "Category alredy Exist..!!";
-    let catSaveMsg = "Category added suceessfully..!!";
+    const catExistMsg = "Category alredy Exist..!!";
+    const catSaveMsg = "Category added suceessfully..!!";
 
     if (req.session.catSave) {
       res.render("admin/add_category", { catSaveMsg, layout: "adminlayout" });
@@ -48,13 +51,15 @@ const addCategoryPage = (req, res) => {
       res.render("admin/add_category", { layout: "adminlayout" });
     }
   } catch (error) {
-    console.log(error);
+    console.log(error.message);
+    res.status(HttpStatus.InternalServerError).send("Internal Server Error");
   }
 };
 
-// Add New Category
 
+// Add New Category
 const addNewCategory = async (req, res) => {
+
   const catName = req.body.name;
   const image = req.file;
 
@@ -69,22 +74,27 @@ const addNewCategory = async (req, res) => {
       });
 
       await category.save();
+
       req.session.catSave = true;
-      res.redirect("/admin/addCategory");
+      res.redirect("/admin/category");
     } else {
       req.session.catExist = true;
       res.redirect("/admin/addCategory");
     }
-  } catch (error) {}
+  } catch (error) {
+    console.log(error.message);
+    res.status(HttpStatus.InternalServerError).send("Internal Server Error");
+  }
 };
 
-// Unlist Category
 
+// Unlist Category
 const unListCategory = async (req, res) => {
   try {
+
     const { id } = req.body;
-    let category = await Category.findById(id);
-    let product = await Product.findById(id)
+
+    const category = await Category.findById(id);
     let newListed = category.isListed;
 
     await Category.findByIdAndUpdate(
@@ -92,10 +102,7 @@ const unListCategory = async (req, res) => {
       { $set: { isListed: !newListed } },
       { new: true }
     );
-    
-    let updated = await productModel.updateMany({category : category} , {$set: {isBlocked : newListed}});
 
-    console.log("updated => ",updated)
     res.redirect("/admin/category");
   } catch (error) {
     console.log(error.message);
@@ -103,30 +110,28 @@ const unListCategory = async (req, res) => {
   }
 };
 
-//Get Edit Category Page
 
+//Load Edit Category Page
 const showEditCategory = async (req, res) => {
   try {
     const categoryId = req.params.id;
     const category = await Category.findById(categoryId).lean()
     res.render("admin/editCategory", { layout: "adminlayout", category });
-  } catch (error) {}
+  } catch (error) {
+    console.log(error.message);
+    res.status(HttpStatus.InternalServerError).send("Internal Server Error");
+  }
 };
 
-// Update Category
 
+// Update Category
 const updateCategory = async (req, res) => {
   try {
     const categoryId = req.params.id;
-    const category = await Category.findById(categoryId);
-
-    if (!category) {
-      console.error("Category not found");
-      return res.status(404).send("Category not found");
-    }
-
     const newCategoryName = req.body.name;
     const image = req.file;
+    const category = await Category.findById(categoryId).lean()
+
     let updImage;
 
     if (image) {
@@ -159,9 +164,10 @@ const updateCategory = async (req, res) => {
     res.redirect("/admin/category");
   } catch (error) {
     console.error("Error updating category:", error);
-    res.status(500).send("Internal Server Error");
+    res.status(HttpStatus.InternalServerError).send("Internal Server Error");
   }
 };
+
 
 module.exports = {
   addCategoryPage,
@@ -169,5 +175,6 @@ module.exports = {
   showCategoryPage,
   unListCategory,
   showEditCategory,
-  updateCategory,
+  updateCategory
+  
 };

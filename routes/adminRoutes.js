@@ -42,6 +42,7 @@ router.get('/admin/editCategory/:id',  showEditCategory)
 router.post('/admin/updateCategory/:id' , store.single('image') , updateCategory )
 
 
+
 // Users Page
 
 router.get('/admin/users', isLogin, usersPage) 
