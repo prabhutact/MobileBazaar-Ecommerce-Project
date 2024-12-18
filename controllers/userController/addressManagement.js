@@ -123,7 +123,6 @@ const editAddressPost = async (req, res) => {
 };
 
 
-
 // Delete Address
 const deleteAddress = async (req, res) => {
   try {
@@ -138,6 +137,7 @@ const deleteAddress = async (req, res) => {
     res.status(HttpStatus.InternalServerError).send("Internal Server Error");
   }
 };
+
 
 
 
