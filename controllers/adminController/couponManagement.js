@@ -38,14 +38,14 @@ const addCouponPage= async(req,res)=>{
 
     try {
         if (req.session.couponMsg) {
-            res.render("admin/addCoupon",{  couponMsg ,title:"Admin",layout:'adminlayout'});
+            res.render("admin/addCoupon",{  couponMsg ,title:"Admin",layout:'adminLayout'});
             req.session.couponMsg = false;
           } else if (req.session.couponExMsg) {
             
-            res.render("admin/addCoupon", { couponExMsg ,title:"Admin",layout:'adminlayout'});
+            res.render("admin/addCoupon", { couponExMsg ,title:"Admin",layout:'adminLayout'});
             req.session.couponExMsg = false;
           } else {
-            res.render("admin/addCoupon",{ title:"Admin",layout:'adminlayout'});
+            res.render("admin/addCoupon",{ title:"Admin",layout:'adminLayout'});
           }
     } catch (error) {
 
@@ -121,7 +121,7 @@ const editCouponPage = async (req, res) => {
             // Format expiry date before passing to the view
             coupon.expiryDate = moment(coupon.expiryDate).format('YYYY-MM-DD');
         }
-        res.render("admin/editCoupon", { coupon, title: "Edit Coupon", layout: "adminlayout" });
+        res.render("admin/editCoupon", { coupon, title: "Edit Coupon", layout: "adminLayout" });
         
     } catch (error) {
         console.error(error.message);

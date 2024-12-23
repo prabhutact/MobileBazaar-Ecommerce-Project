@@ -48,7 +48,7 @@ const addProductPage = async (req, res) => {
   try {
     const category = await Category.find({}).lean();
 
-    res.render("admin/add_product", { layout: "adminlayout", category });
+    res.render("admin/add_product", { layout: "adminLayout", category });
   } catch (error) {
     console.log(error.message);
     res.status(HttpStatus.InternalServerError).send("Internal Server Error");
@@ -101,7 +101,7 @@ const showeditProduct = async (req, res) => {
     res.render("admin/editProduct", {
       productData,
       categories,
-      layout: "adminlayout",
+      layout: "adminLayout",
     });
   } catch (error) {
     console.error("Error creating Product:", error);

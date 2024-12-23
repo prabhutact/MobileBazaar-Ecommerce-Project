@@ -42,13 +42,13 @@ const addCategoryPage = (req, res) => {
     const catSaveMsg = "Category added suceessfully..!!";
 
     if (req.session.catSave) {
-      res.render("admin/add_category", { catSaveMsg, layout: "adminlayout" });
+      res.render("admin/add_category", { catSaveMsg, layout: "adminLayout" });
       req.session.catSave = false;
     } else if (req.session.catExist) {
-      res.render("admin/add_category", { catExistMsg, layout: "adminlayout" });
+      res.render("admin/add_category", { catExistMsg, layout: "adminLayout" });
       req.session.catExist = false;
     } else {
-      res.render("admin/add_category", { layout: "adminlayout" });
+      res.render("admin/add_category", { layout: "adminLayout" });
     }
   } catch (error) {
     console.log(error.message);
@@ -116,7 +116,7 @@ const showEditCategory = async (req, res) => {
   try {
     const categoryId = req.params.id;
     const category = await Category.findById(categoryId).lean()
-    res.render("admin/editCategory", { layout: "adminlayout", category });
+    res.render("admin/editCategory", { layout: "adminLayout", category });
   } catch (error) {
     console.log(error.message);
     res.status(HttpStatus.InternalServerError).send("Internal Server Error");

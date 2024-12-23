@@ -60,7 +60,7 @@ const productOfferPage = async (req,res)=>{
 const addProductOfferPage = async (req,res)=>{
     try {        
         const products = await Product.find({}).lean()
-        res.render("admin/addProductOffer", { layout: "adminlayout", products });
+        res.render("admin/addProductOffer", { layout: "adminLayout", products });
     } catch (error) {
         console.log(error.message)
         res.status(HttpStatus.InternalServerError).send("Internal Server Error");
@@ -134,7 +134,7 @@ const editProductOfferPage = async(req,res)=>{
         const products = await Product.find().lean();
         let startDate = moment(editProductOfferData.startDate).format('YYYY-MM-DD');
         let endDate = moment(editProductOfferData.endDate).format('YYYY-MM-DD');
-        res.render("admin/editProductOffer", { layout: "adminlayout", editProductOfferData,startDate ,endDate, products })
+        res.render("admin/editProductOffer", { layout: "adminLayout", editProductOfferData,startDate ,endDate, products })
 
     } catch (error) {
         console.log(error.message)
@@ -258,7 +258,7 @@ const categoryOfferPage = async (req,res)=>{
 const addCategoryOfferPage = async (req,res)=>{
     try {
         const category = await Category.find({}).lean()
-        res.render("admin/addCategoryOffer", { layout: "adminlayout", category });
+        res.render("admin/addCategoryOffer", { layout: "adminLayout", category });
     } catch (error) {
         console.log(error.message)
         res.status(HttpStatus.InternalServerError).send("Internal Server Error");
@@ -364,7 +364,7 @@ const editCategoryOfferPage = async(req,res)=>{
         let startDate = moment(editCategoryOfferData.startDate).format('YYYY-MM-DD');
         let endDate = moment(editCategoryOfferData.endDate).format('YYYY-MM-DD');
 
-        res.render("admin/editCategoryOffer", { layout: "adminlayout", editCategoryOfferData, startDate , endDate, category })
+        res.render("admin/editCategoryOffer", { layout: "adminLayout", editCategoryOfferData, startDate , endDate, category })
 
     } catch (error) {
         console.log(error.message)
