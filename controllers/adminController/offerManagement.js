@@ -48,7 +48,7 @@ const productOfferPage = async (req,res)=>{
       
           console.log(productOfferData)
         
-        res.render("admin/productOffer", { layout: "adminlayout", productOfferData, pages  });
+        res.render("admin/productOffer", { layout: "adminLayout", productOfferData, pages  });
     } catch (error) {
         console.log(error.message)
         res.status(HttpStatus.InternalServerError).send("Internal Server Error");
@@ -245,7 +245,7 @@ const categoryOfferPage = async (req,res)=>{
             return data
         })
         
-        res.render("admin/categoryOffer", { layout: "adminlayout", categoryOffers, pages  });
+        res.render("admin/categoryOffer", { layout: "adminLayout", categoryOffers, pages  });
     } catch (error) {
         console.log(error.message)
         res.status(HttpStatus.InternalServerError).send("Internal Server Error");

@@ -26,7 +26,7 @@ const showCategoryPage = async (req, res) => {
       pages,
       currentPage: page,
       category,
-      layout: "adminlayout",
+      layout: "adminLayout",
     });
   } catch (error) {
     console.log(error.message);

@@ -267,6 +267,8 @@
    
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+<script src="https://cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/alertify.min.js"></script>
+
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
 <script>
@@ -286,8 +288,9 @@
     let originalSubTotal = Number(document.getElementsByName('subTotal')[0].value) ;
 
     const toggleCoupon = async () => {
+        
         ct+=1
-        couponEl = document.getElementById('copon').value;
+        couponEl = document.getElementById('copon').value.trim();
         const currentStatus = document.getElementById('couponBtn').innerText.trim();
         const endpoint = currentStatus === 'Apply' ? '/apply_coupon' : '/remove_coupon';
 
@@ -306,7 +309,7 @@
         const setCouponStatus = (msg, element) => {
             element.innerHTML = `<p>${msg}</p>`;
             setTimeout(() => {
-                element.style.opacity = 0;
+                element.style.opacity = 1;
                 element.innerHTML = '';
             }, 2000);
         };
@@ -326,9 +329,13 @@
         } else if (couponData.status === 'not_used') {
             ct=0
             setCouponStatus('Coupon not used yet!', couponMsg);
-        } else if (couponData.status === 'removed') {
+        } else if (couponData.status === 'min_purchase_not_met') {
+        ct = 0;
+        setCouponStatus('Minimum purchase not met!', couponMsg);
+        }else if (couponData.status === 'removed') {
             setCouponStatus('Coupon removed successfully', couponMsg);
             document.getElementById('couponBtn').innerHTML = '<i class="fi-rs-label mr-10"></i>Apply';
+            document.getElementById('copon').value = '';
         } else if (couponData.status === 'applied') {
             setCouponStatus('Coupon applied successfully', sCoponMsg);
             document.getElementById('couponBtn').innerHTML = '<i class="fi-rs-label mr-10"></i>Remove';
@@ -405,11 +412,21 @@
 
     const useWallet = () => {
         const wallet = document.getElementsByName('wallet')[0].value
-        const subTotal = Number(document.getElementsByName('subTotal')[0].value)
+        let subTotal = Number(document.getElementsByName('subTotal')[0].value)
         console.log(wallet, 'walletttttttttttt', subTotal)
+        const deliveryCharge = 50;
 
-        if (wallet > subTotal) {
-            updateWallet = wallet - subTotal
+        if (couponData && couponData.status === 'applied') {
+        subTotal = couponData.newTotal; // Updated subTotal after coupon
+        }
+        const totalAmount = subTotal + deliveryCharge;
+
+        console.log(wallet, 'wallet balance');
+        console.log(subTotal, 'discounted subTotal');
+        console.log(totalAmount, 'totalAmount (subTotal + delivery charge)');
+
+        if (wallet >= totalAmount) {
+            updateWallet = wallet - totalAmount
 
             console.log(updateWallet, 'my name is update wallet...........')
             Cod()
@@ -443,6 +460,7 @@
                 couponName: couponEl,
                 updateWallet: updateWallet
             }
+            console.log('req.body--------------------->', requestBody)
             
             if (!paymentStatus) {
                 console.log('payment status failed   =>        ')

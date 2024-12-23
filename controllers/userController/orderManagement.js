@@ -68,6 +68,11 @@ const cancelOrder = async (req, res) => {
 
         }
 
+        let couponAmountEach = 0
+        if(canceledOrder.coupon){
+            couponAmountEach = canceledOrder.discountAmt / canceledOrder.product.length
+
+        }
        
 
         if (['wallet', 'razorpay'].includes(canceledOrder.paymentMethod)) {
@@ -75,9 +80,9 @@ const cancelOrder = async (req, res) => {
                 //await Product.updateOne({ _id: data._id }, { $inc: { stock: data.quantity } });
                 await User.updateOne(
                     { _id: req.session.user._id },
-                    { $inc: { wallet: data.price * data.quantity } }
+                    { $inc: { wallet: (data.price * data.quantity) - couponAmountEach } }
                 );
-                notCancelledAmt += data.price * data.quantity;
+                notCancelledAmt += (data.price * data.quantity) - couponAmountEach;
             }
             
 

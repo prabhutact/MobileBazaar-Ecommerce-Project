@@ -193,8 +193,8 @@ const loadCheckoutPage = async (req, res) => {
 
 const placeorder = async (req, res) => {
   try {
-    console.log("place order ");
-    userData = req.session.user;
+    console.log("place order ", req.body);
+    let userData = req.session.user;
     const ID = new mongoose.Types.ObjectId(userData._id);
     const addressId = req.body.selectedAddress;
     const payMethod = req.body.selectedPayment;
@@ -202,7 +202,7 @@ const placeorder = async (req, res) => {
     console.log("Request dot body  ", addressId, payMethod, totalamount);
 
     console.log('Coupon data:', req.body.couponData); 
-console.log('Coupon Name:', req.body.couponName); 
+    console.log('Coupon Name:', req.body.couponName); 
 
     const result = Math.random().toString(36).substring(2, 7);
     const id = Math.floor(100000 + Math.random() * 900000);
@@ -249,6 +249,7 @@ console.log('Coupon Name:', req.body.couponName);
 
     console.log(productDet, "aggregated cart prods");
 
+    // Apply coupon if present
     let finalTotal = totalamount;
     let discountAmt = 0;
 
@@ -262,7 +263,8 @@ console.log('Coupon Name:', req.body.couponName);
     const grandTotal = finalTotal + DELIVERY_CHARGE;
 
     let saveOrder = async () => {
-      const order = new Order({
+      console.log("paymentMethod", payMethod)
+      const order = new Order({  
         userId: ID,
         product: productDet,
         address: addressId,
@@ -295,13 +297,22 @@ console.log('Coupon Name:', req.body.couponName);
 
     })
 
+    // Mark the coupon as used after the order is placed
+    if (req.body.couponData) {
+      await Coupon.updateOne(
+        { code: req.body.couponName },
+        { $push: { usedBy: ID } }
+      );
+    }
+
+
       const deletedCart = await Cart.deleteMany({
         userId: ID,
       }).lean();
 
       console.log(deletedCart, "deletedCart");
     };
-
+//save order ends
     if (addressId) {
       if (payMethod === "cash-on-delivery") {
         console.log("CASH ON DELIVERY");
@@ -326,13 +337,33 @@ console.log('Coupon Name:', req.body.couponName);
           amount,
         });
       } else if (payMethod === "wallet") {
+        console.log('inside the wallettttttttttt')
+
         const newWallet = req.body.updateWallet;
 
-        await User.findByIdAndUpdate(
+        const userWallet = await User.findByIdAndUpdate(
           userData._id,
-          { $set: { wallet: newWallet + 50 } },
+          { $set: { wallet: newWallet } },
           { new: true }
         );
+
+        console.log("userwalet" , userWallet)
+
+        const userHistory = await User.updateOne(
+          {_id:userData._id},
+          {
+            $push:{
+              history:{
+                amount:grandTotal,
+                status:"debited",
+                date:Date.now()
+              }
+            }
+          }
+        )
+
+        console.log("userHistory  ", userHistory)
+
 
         await saveOrder();
 
@@ -350,9 +381,10 @@ console.log('Coupon Name:', req.body.couponName);
 
 const orderSuccess = async (req, res) => {
   try {
+
     res.render("user/orderPlaced", {
       title: "Order Placed",
-      userData,
+      userData: req.session.user,
     });
   } catch (error) {
     console.log(error.message);
@@ -426,10 +458,10 @@ const applyCoupon = async (req, res) => {
       return res.json({ status: "min_purchase_not_met" });
     } else {
   
-      await Coupon.updateOne(
-        { _id: coupon._id },
-        { $push: { usedBy: userId } }
-      );
+      // await Coupon.updateOne(
+      //   { _id: coupon._id },
+      //   { $push: { usedBy: userId } }
+      // );
 
      
       let discountAmt = (subTotal * coupon.discount) / 100;

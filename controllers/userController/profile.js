@@ -273,6 +273,7 @@ const orderDetails = async (req, res) => {
             $project: {
                 _id: 1,
                 product: {
+                    _id: "$product._id",
                     name: "$product.name",
                     image: "$product.image",
                     quantity: "$product.quantity",
