@@ -34,7 +34,7 @@ const showProduct = async (req, res) => {
     const totalPages = Math.ceil(count / limit); 
     const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
     console.log(product);    
-    res.render("admin/product", { layout: "adminlayout", product, pages });
+    res.render("admin/product", { layout: "adminLayout", product, pages });
   } catch (error) {
     console.log(error.message);
     res.status(HttpStatus.InternalServerError).send("Internal Server Error");
