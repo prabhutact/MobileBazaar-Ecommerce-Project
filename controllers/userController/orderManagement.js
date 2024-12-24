@@ -92,7 +92,7 @@ const cancelOrder = async (req, res) => {
                     $push: {
                         history: {
                             amount: notCancelledAmt,
-                            status: 'refund for Order Cancellation',
+                            status: 'Refund Amount for Order Cancellation',
                             date: Date.now()
                         }
                     }
@@ -169,7 +169,7 @@ const returnOrder = async (req, res) => {
                     $push: {
                         history: {
                             amount: notCancelledAmt,
-                            status: 'Refund Amount for Return',
+                            status: 'Refund Amount for Order Return',
                             date: Date.now()
                         }
                     }
