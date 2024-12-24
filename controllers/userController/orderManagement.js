@@ -143,6 +143,10 @@ const returnOrder = async (req, res) => {
 
         }
 
+        let order = await Order.findById(id)
+        let amountToReturned = order.amountAfterDscnt
+
+
         let couponAmountEach = 0
         if(returnedOrder.coupon){
             couponAmountEach = returnedOrder.discountAmt / returnedOrder.product.length
@@ -165,7 +169,7 @@ const returnOrder = async (req, res) => {
                     $push: {
                         history: {
                             amount: notCancelledAmt,
-                            status: 'refund of Order Return',
+                            status: 'Refund Amount for Return',
                             date: Date.now()
                         }
                     }
@@ -183,97 +187,6 @@ const returnOrder = async (req, res) => {
         res.status(HttpStatus.InternalServerError).send('Internal Server Error');
     }
 };
-
-
-// const returnOrder = async (req, res) => {
-//     try {
-//         const id = req.params.id;
-        
-//         if (!mongoose.Types.ObjectId.isValid(id)) {
-//             return res.status(400).json({ error: 'Invalid order ID' });
-//         }
-//         const ID = new mongoose.Types.ObjectId(id);
-//         let notCancelledAmt = 0;
-
-        
-//         let returnedOrder = await Order.findOne({ _id: ID }).lean();
-//         console.log(returnedOrder, "returnedOrder");
-
-        
-//         const returnedorder = await Order.findByIdAndUpdate(ID, { $set: { status: 'Returned' } }, { new: true });
-
-        
-//         for (const data of returnedorder.product) {
-//             if (!data.isCancelled) {
-               
-//                 await Product.updateOne(
-//                     { _id: data._id },
-//                     { $inc: { stock: data.quantity } }
-//                 );
-
-//                 // Mark the product as returned in the order
-//                 await Order.updateOne(
-//                     { _id: ID, 'product._id': data._id },
-//                     { $set: { 'product.$.isReturned': true } }
-//                 );
-
-//                 let refundAmount = 0;
-
-                
-//                 if (data.couponUsed) {
-                    
-//                     const coupon = await Coupon.findOne({ code: data.coupon });
-//                     if (coupon) {
-                        
-//                         const discountAmt = (data.price * coupon.discount) / 100;
-                        
-//                         refundAmount = (data.amountAfterDscnt || (data.price - discountAmt)) * data.quantity;
-//                     }
-//                 } else {
-                    
-//                     refundAmount = data.price * data.quantity;
-//                 }
-
-//                 // If the payment method is 'wallet' or 'razorpay', update the user's wallet
-//                 if (['wallet', 'razorpay'].includes(returnedOrder.paymentMethod)) {
-    
-//                     await User.updateOne(
-//                         { _id: req.session.user._id },
-//                         { $inc: { wallet: refundAmount } }
-//                     );
-
-                   
-//                     notCancelledAmt += refundAmount;
-//                 }
-//             }
-//         }
-
-        
-//         await User.updateOne(
-//             { _id: req.session.user._id },
-//             {
-//                 $push: {
-//                     history: {
-//                         amount: notCancelledAmt,
-//                         status: 'refund of Order Return',
-//                         date: Date.now()
-//                     }
-//                 }
-//             }
-//         );
-
-        
-//         res.json({
-//             success: true,
-//             message: 'Successfully Returned Order'
-//         });
-
-//     } catch (error) {
-//         console.log(error.message);
-//         res.status(HttpStatus.InternalServerError).send('Internal Server Error');
-//     }
-// };
-
 
 
 
@@ -328,7 +241,7 @@ const cancelOneProduct = async (req, res) => {
                     $push: {
                         history: {
                             amount: newTotal,
-                            status: `refund of: ${result.product[0].name}`,
+                            status: `Refund Amount for Cancel ${result.product[0].name}`,
                             date: Date.now()
                         }
                     }
@@ -346,7 +259,7 @@ const cancelOneProduct = async (req, res) => {
                     $push: {
                         history: {
                             amount: productprice,
-                            status: `refund of: ${result.product[0].name}`,
+                            status: `Refund Amount for Cancel ${result.product[0].name}`,
                             date: Date.now()
                         }
                     }
@@ -417,7 +330,7 @@ const returnOneProduct = async (req, res) => {
                     $push: {
                         history: {
                             amount: newTotal,
-                            status: `[return] refund of: ${result.product[0].name}`,
+                            status: `Refund Amount for Return ${result.product[0].name}`,
                             date: Date.now()
                         }
                     }
@@ -435,7 +348,7 @@ const returnOneProduct = async (req, res) => {
                     $push: {
                         history: {
                             amount: productprice,
-                            status: `[return]refund of: ${result.product[0].name}`,
+                            status: `[return] ${result.product[0].name}`,
                             date: Date.now()
                         }
                     }

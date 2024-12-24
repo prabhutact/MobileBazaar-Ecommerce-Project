@@ -112,9 +112,8 @@ const addProductOffer = async (req, res) => {
         await proOffer.save();
         console.log("Product offer saved:", proOffer);
 
-        
-        product.productOfferId = proOffer._id;
-        await product.save();
+
+        //await product.save();
 
         return res.status(HttpStatus.OK).json({ message: "Product offer added successfully!" });
 

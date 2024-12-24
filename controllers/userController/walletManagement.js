@@ -41,7 +41,7 @@ let addMoneyToWallet = async (req, res) => {
                         $push: {
                             history: {
                                 amount: amount,
-                                status: "credit",
+                                status: "Amount Credited",
                                 date: Date.now()
                             }
                         }

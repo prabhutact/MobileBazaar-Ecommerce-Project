@@ -14,83 +14,6 @@ const ObjectId = require("mongoose");
 
 
 
-
-// const loadCheckoutPage = async (req, res) => {
-//   try {
-//     let userData = await User.findById(req.session.user._id).lean();
-//     const ID = new mongoose.Types.ObjectId(userData._id);
-
-//     const addressData = await Address.find({ userId: userData._id }).lean();
-//     let coupon = await Coupon.find().lean();
-
-//     const subTotal = await Cart.aggregate([
-//       {
-//         $match: {
-//           userId: ID,
-//         },
-//       },
-//       {
-//         $group: {
-//           _id: null,
-//           total: { $sum: "$value" },
-//         },
-//       },
-//       {
-//         $project: {
-//           _id: 0,
-//           total: 1,
-//         },
-//       },
-//     ]);
-//     let cart = await Cart.aggregate([
-//       {
-//         $match: {
-//           userId: ID,
-//         },
-//       },
-//       {
-//         $lookup: {
-//           from: "products",
-//           foreignField: "_id",
-//           localField: "product_Id",
-//           as: "productData",
-//         },
-//       },
-//       {
-//         $project: {
-//           _id: 1,
-//           userId: 1,
-//           quantity: 1,
-//           value: 1,
-//           productName: { $arrayElemAt: ["$productData.name", 0] },
-//           productPrice: {
-//             $cond: {
-//               if: { $gt: [{ $ifNull: ["$productOffer.discountPrice", 0] }, 0] }, 
-//               then: "$productOffer.discountPrice", 
-//               else: "$productData.price", 
-//             },
-//           },
-//           productDescription: { $arrayElemAt: ["$productData.description", 0] },
-//           productImage: { $arrayElemAt: ["$productData.imageUrl", 0] },
-//         },
-//       },
-//     ]);
-//     console.log(cart);
-
-//     res.render("user/checkout", {
-//       userData,
-//       addressData,
-//       subTotal: subTotal[0].total,
-//       cart,
-//       coupon,
-//     });
-//   } catch (error) {
-//     console.log(error.message);
-//     res.status(HttpStatus.InternalServerError).send("Internal Server Error");
-//   }
-// };
-
-
 const loadCheckoutPage = async (req, res) => {
   try {
     let userData = await User.findById(req.session.user._id).lean();
@@ -178,7 +101,7 @@ const loadCheckoutPage = async (req, res) => {
     res.render("user/checkout", {
       userData,
       addressData,
-      subTotal: subTotal[0]?.total || 0, // Fallback for subtotal if it's undefined
+      subTotal: subTotal[0]?.total || 0, 
       cart,
       coupon,
     });
@@ -235,13 +158,14 @@ const placeorder = async (req, res) => {
         },
       },
     ]);
-    console.log(productInCart);
+
+    console.log("product in cart =======>",productInCart);
 
     let productDet = productInCart.map((item) => {
       return {
         _id: item.product_Id,
         name: item.name,
-        price: item.price,
+        price: item.value,
         quantity: item.quantity,
         image: item.image[0],
       };
@@ -301,7 +225,7 @@ const placeorder = async (req, res) => {
     if (req.body.couponData) {
       await Coupon.updateOne(
         { code: req.body.couponName },
-        { $push: { usedBy: ID } }
+        { $addToSet: { usedBy: ID } }
       );
     }
 
@@ -355,7 +279,7 @@ const placeorder = async (req, res) => {
             $push:{
               history:{
                 amount:grandTotal,
-                status:"debited",
+                status:"Amount Debited",
                 date:Date.now()
               }
             }
@@ -458,10 +382,10 @@ const applyCoupon = async (req, res) => {
       return res.json({ status: "min_purchase_not_met" });
     } else {
   
-      // await Coupon.updateOne(
-      //   { _id: coupon._id },
-      //   { $push: { usedBy: userId } }
-      // );
+      await Coupon.updateOne(
+        { _id: coupon._id },
+        { $addToSet: { usedBy: userId } }
+      );
 
      
       let discountAmt = (subTotal * coupon.discount) / 100;

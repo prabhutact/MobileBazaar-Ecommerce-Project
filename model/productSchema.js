@@ -32,14 +32,6 @@ const productSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-    productOfferId:{
-      type: mongoose.Types.ObjectId,
-      default: null
-    },
-    productOfferPercentage:{
-      type:Number,
-      default: null
-    },
     discountedPrice: { 
       type: Number 
     },
