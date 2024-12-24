@@ -16,62 +16,21 @@
         <a  class="btn btn-primary btn-sm rounded" href="/admin/addCategory">Create New Category</a>
       </div>
     </div>
-{{!-- <div class="card mb-4">
-    <div class="card-body">
-        {{#each category}}
-        <article class="itemlist" style="margin-bottom: 20px;"> <!-- Add margin-bottom here -->
-            <div class="row align-items-center" style="display: flex; justify-content: space-between; padding: 0 10px;">
-                <!-- Category Image -->
-                <div class="col-lg-2 col-sm-2 col-2 text-center" style="flex: 1;">
-                    <a class="itemside" href="#">
-                        <div class="d-flex align-items-center justify-content-center">
-                            <img src="/assets/imgs/products/{{imageUrl}}" class="img-sm img-thumbnail" alt="Item" style="max-width: 100%; height: auto;">
-                        </div>
-                    </a>
-                </div>
-
-                <!-- Category Name -->
-                <div class="col-lg-2 col-sm-2 col-2 text-center" style="flex: 1;">
-                    <a class="itemside" href="#">
-                        <div class="info">
-                            <h6 class="mb-0">{{this.category}}</h6>
-                        </div>
-                    </a>
-                </div>
-
-                <!-- Status (Listed/Unlisted) -->
-                <div class="col-lg-2 col-sm-2 col-2 text-center" style="flex: 1;">
-                    {{#if isListed}}
-                        <span class="badge rounded-pill alert-success">Listed</span>
-                    {{else}}
-                        <span class="badge rounded-pill alert-danger">Unlisted</span>
-                    {{/if}}
-                </div>
-
-                <!-- Buttons section: Edit, Unlist/List -->
-                <div class="col-lg-3 col-sm-3 col-3 d-flex justify-content-end" style="flex: 0 1 35%;">
-                    <a href="/admin/editCategory/{{this._id}}" class="btn btn-pill font-sm rounded btn-brand mx-1">
-                        Edit<i class="material-icons md-edit" style="font-size: 16px;"></i> 
-                    </a>
-                    {{#if isListed}}
-                        <a href="/admin/unlistCategory" id="listunlistrod" data-product-id="{{this._id}}" class="btn btn font-sm btn-light rounded mx-1">
-                            Unlist<i class="material-icons md-delete_forever" style="font-size: 16px;"></i> 
-                        </a>
-                    {{else}}
-                        <a href="/admin/unlistCategory" id="listunlistrod" data-product-id="{{this._id}}" class="btn btn font-sm btn-light rounded mx-1">
-                            List<i class="material-icons md-delete_forever" style="font-size: 16px;"></i> 
-                        </a>
-                    {{/if}}
-                    
-                </div>
-            </div>
-        </article>
-        {{/each}}
-    </div>
-</div> --}}
 
 <div class="card mb-4">
     <div class="card-body">
+        {{#if catSaveMsg}}
+        <div class="alert alert-success mt-3 alert-dismissible fade  {{#if catSaveMsg}}show{{/if}}" role="alert">
+            {{catSaveMsg}}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {{/if}}
+        {{#if catExistMsg}}
+        <div class="alert alert-danger mt-3 alert-dismissible fade {{#if catExistMsg}}show{{/if}}" role="alert">
+            {{catExistMsg}}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {{/if}}
         <!-- Table Structure -->
         <table class="table table-bordered">
             <thead>

@@ -1,7 +1,7 @@
 const express = require("express")
 const router = express.Router()
 const { logedout, logedin, isBlocked } = require('../middleware/usersAuth')
-const { getHome, getLogin, getSignup, doSignup, getOtp, submitOtp, resendOtp, doLogin, doLogout , googleCallback, productDetails } = require("../controllers/userController/userController")
+const { getHome, getLogin, getSignup, doSignup, getOtp, submitOtp, resendOtp, doLogin, doLogout , googleCallback, productDetails, aboutpage } = require("../controllers/userController/userController")
 const { submitMail, submitMailPost, forgotOtppage, forgotOtpSubmit, resetPasswordPage, resetPassword } = require('../controllers/userController/forgotPassword')
 const { viewUserProfile, EditUserProfile, updateUserProfile, changePassword, updatePassword, my_Orders, orderDetails, verify, walletpage, retryPayment } = require('../controllers/userController/profile')
 const { addAddress, addAddressPost, manageAddress, editAddress, editAddressPost, deleteAddress } = require('../controllers/userController/addressManagement')
@@ -136,6 +136,8 @@ router.put('/return-one-product', logedin, isBlocked, returnOneProduct);
 
 router.get('/get_invoice', logedin, isBlocked, getInvoice)
 
+
+router.get('/about', aboutpage)
 
 
 

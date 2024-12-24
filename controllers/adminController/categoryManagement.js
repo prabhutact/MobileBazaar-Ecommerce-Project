@@ -21,11 +21,21 @@ const showCategoryPage = async (req, res) => {
     const count = await Category.find({}).countDocuments();
     const totalPages = Math.ceil(count / limit);
     const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
+
+    const catSaveMsg = req.session.catSave ? "Category added successfully..!!" : null;
+    const catExistMsg = req.session.catExist ? "Category already exists..!!" : null;
+
+    // Reset the session messages
+    req.session.catSave = false;
+    req.session.catExist = false;
+
     res.render("admin/show_category", {
       admin: true,
       pages,
       currentPage: page,
       category,
+      catSaveMsg,
+      catExistMsg,
       layout: "adminLayout",
     });
   } catch (error) {
@@ -38,19 +48,8 @@ const showCategoryPage = async (req, res) => {
 //Load Add Category Page
 const addCategoryPage = (req, res) => {
   try {
-    const catExistMsg = "Category alredy Exist..!!";
-    const catSaveMsg = "Category added suceessfully..!!";
-
-    if (req.session.catSave) {
-      res.render("admin/add_category", { catSaveMsg, layout: "adminLayout" });
-      req.session.catSave = false;
-    } else if (req.session.catExist) {
-      res.render("admin/add_category", { catExistMsg, layout: "adminLayout" });
-      req.session.catExist = false;
-    } else {
-      res.render("admin/add_category", { layout: "adminLayout" });
-    }
-  } catch (error) {
+      res.render("admin/add_category", {layout: "adminLayout" });
+    } catch (error) {
     console.log(error.message);
     res.status(HttpStatus.InternalServerError).send("Internal Server Error");
   }

@@ -10,6 +10,7 @@ const mongoose = require("mongoose")
 const userRouter = require("./routes/userRoutes")
 const adminRouter = require("./routes/adminRoutes")
 const hbsHelper=require('./helpers/hbsHelpers')
+const createError = require('http-errors');
 
 require('dotenv').config()
 
@@ -48,6 +49,27 @@ app.use("/", adminRouter)
 
 require('dotenv').config()
 
+// Catch 404 and forward to error handler
+app.use(function(req, res, next) {
+  next(createError(404));
+});
+
+
+// Error handler middleware
+app.use((err, req, res, next) => {
+    
+  res.locals.message = err.message;
+  res.locals.error = req.app.get('env') === 'development' ? err : {};
+
+ res.status(err.status || 500);
+ if (err.status === 404) {
+     res.render('404', { layout: 'emptyLayout' });
+ } else {
+     res.render('error',{layout : 'emptyLayout'}); 
+ }
+});
+
+
 mongoose.connect(process.env.MONGODB)
 .then(() => {
   console.log('MongoDB Connected');
@@ -56,11 +78,14 @@ mongoose.connect(process.env.MONGODB)
   console.error('MongoDB Connection Error:', err);
 });
 
+
 const PORT = process.env.PORT
+
 
 app.listen(PORT, (req, res) => {
   console.log(`http://localhost:${PORT}`)
 })
+
 
 
 

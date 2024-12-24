@@ -407,6 +407,17 @@ const productDetails = async (req, res) => {
 };
 
 
+const aboutpage = async (req, res) => {
+  try {
+      res.render('user/about')
+
+  } catch (error) {
+      console.log(error.message);
+      res.status(HttpStatus.InternalServerError).send("Internal Server Error");
+
+  }
+}
+
 
 
 
@@ -422,5 +433,6 @@ module.exports = {
   doLogout,
   googleCallback,
   productDetails,
+  aboutpage
  
 };
