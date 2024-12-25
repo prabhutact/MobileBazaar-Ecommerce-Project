@@ -240,14 +240,17 @@ const updateCart = async (req, res) => {
   try {
     const userData = req.session.user;
     const ID = new mongoose.Types.ObjectId(userData._id);
-    const { cartIdForUpdate } = req.body;
-    const oldCart = await Cart.findOne({ _id: req.body.cartIdForUpdate });
+    const { cartIdForUpdate, newValue } = req.body;
+
+    // fetch the cart item
+    const oldCart = await Cart.findOne({ _id: cartIdForUpdate });
     console.log(cartIdForUpdate, oldCart);
 
     const price = oldCart.price;
 
-    const newValue = req.body.newValue * price;
-    console.log(cartIdForUpdate, newValue);
+    //const newValue = req.body.newValue * price;
+
+    // Fetch the stock for the product associated with the cart item
     let cartquant = await Product.findOne(
       { _id: oldCart.product_Id },
       { stock: 1, _id: 0 }
@@ -257,21 +260,37 @@ const updateCart = async (req, res) => {
       "cartquant--------------------------------------------------------------"
     );
 
-    if (req.body.newValue > cartquant.stock) {
+    // allowed maximum 4 units per user
+    if (newValue > 4) {
+      return res.json({
+        success: false,
+        message: "You can only choose up to 4 units of this product.",
+      });
+    }
+
+    if (newValue > cartquant.stock) {
       return res.json({
         success: false,
         message: "Product stock limit reached!",
       });
     }
 
+    // Calculate the new total value for the cart item based on the new quantity
+      const updatedValue = newValue * price;
+      console.log(cartIdForUpdate, updatedValue);
+
     const updatedcartvalue = await Cart.updateOne(
-      { _id: req.body.cartIdForUpdate },
-      { $set: { quantity: req.body.newValue, value: newValue } }
+      { _id: cartIdForUpdate },
+      { $set: { quantity: newValue, value: updatedValue } }
     );
     console.log(updatedcartvalue);
+
+    // Fetch the updated cart data
     const updatedCart = await Cart.find({
-      _id: req.body.cartIdForUpdate,
+      _id: cartIdForUpdate,
     }).lean();
+
+    // Calculate the subtotal for the user's cart
     const subTotal = await Cart.aggregate([
       {
         $match: {
@@ -293,6 +312,7 @@ const updateCart = async (req, res) => {
     ]);
     console.log(subTotal, "SUBTOTAL");
 
+    // Prepare the updated cart data to return to the user
     const newData = [];
 
     updatedCart.forEach((data) => {
@@ -302,17 +322,18 @@ const updateCart = async (req, res) => {
     newDataItem.totalAmount = "Out of Stock";  
     newDataItem.outOfStock = true; 
   } else {
-    newDataItem.totalAmount = newValue;
+    newDataItem.totalAmount = updatedValue;
   }
 
       newData.push(newDataItem);
     });
     console.log(newData, "itemsitemssss");
+
     const cartValue = newData.reduce((acc, item) => acc + item.totalAmount, 0);
     console.log(cartValue);
     res.json({
       success: true,
-      message: "updated",
+      message: "Cart Updated",
       cartProd: newData,
       items: newData,
       cartValue: subTotal,
