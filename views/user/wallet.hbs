@@ -12,7 +12,7 @@
     <div class="page-header breadcrumb-wrap">
         <div class="container">
             <div class="breadcrumb">
-                <a href="index.html" rel="nofollow">Home</a>
+                <a href="/" rel="nofollow">Home</a>
                 <span></span> Pages
                 <span></span> Account
             </div>
@@ -146,7 +146,7 @@
                         "currency": "INR",
                         "name": "MobileBazaar",
                         "description": "Test Transaction",
-                        "image": "https://blog.flamingtext.com/blog/2024/02/02/flamingtext_com_1706871147_110639469.png",
+                        //"image": "https://blog.flamingtext.com/blog/2024/02/02/flamingtext_com_1706871147_110639469.png",
                         "order_id": data.order.id,
                         "handler": function (response) {
                             verifyPayment(response, data);
@@ -188,7 +188,7 @@
                 if (response) {
                     Swal.fire({
                         title: "Success",
-                        text: "Payment has been succeed",
+                        text: "Payment added successfully",
                         icon: "success",
 
                     }).then(function () {

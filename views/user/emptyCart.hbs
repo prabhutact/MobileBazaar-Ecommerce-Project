@@ -1,48 +1,49 @@
 <body>
-  <div class="container-fluid" style="margin-top: 100px;">
+  <div class="container-fluid" style="margin-top: 100px; margin-bottom: 100px;">
     <div class="row">
-
       <div class="col-md-12">
-
-
-        {{!-- <div class="card-header">
-          <h5>Cart</h5>
-        </div> --}}
-
-        <section class="mt-10 mb-50">
+        <section class="mt-5 mb-5">
           <div class="container">
-            <div class="row">
-              <div class="container mt-5">
-                <div class="row justify-content-center">
-                  <div class="col-12">
-                    <div class="text-center">
-                      <img src="images/users/empty-cart-yellow.png" alt="Empty Cart Image"
-                        style="width: 400px;" />
-                      {{!-- <h1 style="font-weight: 700;">Your Cart Is <span style="color: red;">Empty</span></h1> --}}
-                      <p>Add items to the Cart . <a href="/shop" style="color: red;text-decoration:underline"> Shop more !</a></p>
-                    </div>
-                  </div>
+            <div class="row justify-content-center">
+              <div class="col-12 text-center">
+                <div style="padding: 50px;">
+                  <h1 style="font-size: 3rem; font-weight: bold; color: #2c3e50;">
+                    Your Cart is <span style="color: #28a745;">Empty</span>
+                  </h1>
+                  <p style="font-size: 1.3rem; margin-top: 20px; color: #555;">
+                    Looks like you haven’t added anything yet.
+                  </p>
+                  <p style="font-size: 1.1rem; margin-top: 10px; color: #666;">
+                    Browse our collection and fill it up!  
+                    <a href="/shop" style="color: #28a745; text-decoration: underline; font-weight: bold;">Shop Now</a>
+                  </p>
                 </div>
               </div>
-
             </div>
           </div>
         </section>
-
-
-
       </div>
-
     </div>
-
   </div>
 </body>
 
 <style>
-  .btn-primary,
-  .btn-primary.disabled,
-  .btn-primary:disabled {
-    background-color: #4466f2 !important;
-    border-color: #4466f2 !important;
+  body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f9f9f9; /* Light gray background for a clean look */
+  }
+
+  h1 {
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+  }
+
+  p {
+    line-height: 1.6;
+  }
+
+  a:hover {
+    color: #218838; /* Darker green for hover */
+    text-decoration: none; /* Remove underline on hover */
   }
 </style>

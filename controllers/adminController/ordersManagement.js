@@ -19,7 +19,7 @@ const ordersPage = async (req, res) => {
       page = req.query.page;
     }
     console.log(page);
-    const limit = 3;
+    const limit = 5;
 
     const ordersData = await Order.find()
       .sort({ date: -1 })

@@ -1,48 +1,47 @@
 <body>
-  <div class="container-fluid" style="margin-top: 100px;">
+  <div class="container-fluid" style="margin-top: 150px; margin-bottom: 150px;">
     <div class="row">
-
       <div class="col-md-12">
-
-
-        {{!-- <div class="card-header">
-          <h5>Cart</h5>
-        </div> --}}
-
-        <section class="mt-10 mb-50">
+        <section class="mt-5 mb-5">
           <div class="container">
-            <div class="row">
-              <div class="container mt-5">
-                <div class="row justify-content-center">
-                  <div class="col-12">
-                    <div class="text-center">
-                      <img src="images/users/wishlistempty.png" alt="Empty Cart Image"
-                        style="width: 400px;" />
-                      {{!-- <h1 style="font-weight: 700;">Your Cart Is <span style="color: red;">Empty</span></h1> --}}
-                      <p>Add items to the Wishlist . <a href="/shop" style="color: red;text-decoration:underline"> Shop more !</a></p>
-                    </div>
-                  </div>
-                </div>
+            <div class="row justify-content-center">
+              <div class="col-12 text-center">
+                <h1 style="font-size: 3rem; font-weight: 700; color: #333; margin-bottom: 20px;">
+                  Your Wishlist is <span style="color: red;">Empty</span>
+                </h1>
+                <p style="font-size: 1.2rem; color: #666; margin-top: 15px;">
+                  Add items to the wishlist to save your favorites. <br />
+                  <a href="/shop" style="color: #4466f2; text-decoration: underline; font-weight: 600;">
+                    Shop Now!
+                  </a>
+                </p>
               </div>
-
             </div>
           </div>
         </section>
-
-
-
       </div>
-
     </div>
-
   </div>
 </body>
 
 <style>
-  .btn-primary,
-  .btn-primary.disabled,
-  .btn-primary:disabled {
-    background-color: #4466f2 !important;
-    border-color: #4466f2 !important;
+  body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f8f9fa; /* Light gray for better aesthetics */
+  }
+
+  h1 {
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+
+  p {
+    font-size: 1.1rem;
+    color: #555;
+  }
+
+  a:hover {
+    color: red;
+    text-decoration: none; /* Remove underline on hover */
   }
 </style>
