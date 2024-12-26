@@ -409,7 +409,7 @@ const productDetails = async (req, res) => {
 
 const aboutpage = async (req, res) => {
   try {
-      res.render('user/about')
+      res.render('user/about', {userData})
 
   } catch (error) {
       console.log(error.message);
