@@ -150,7 +150,7 @@ function Validation(event) {
     // Regular expressions for validation
     const productNameRegex = /^[a-zA-Z0-9\s\(\)\-\+]{4,}$/;
     const number = /^[0-9]\d*$/;
-    const descriptionRegex = /^(?!\s*$)[a-zA-Z0-9\s\(\)\-\+]{1,100}$/;
+    const descriptionRegex = /^(?!\s*$)[a-zA-Z0-9\s\(\)\-\+]{10,100}$/;
 
 
     // Alert elements
@@ -169,7 +169,7 @@ function Validation(event) {
 
     // Validate Product Name
   if (productName.length < 4) {
-        productNameAlert.innerHTML = "Product name shoul be minimum 4 characters.";
+        productNameAlert.innerHTML = "minimum 4 characters.";
         errors.push("Invalid Product Name");
     } else if (!productName.match(productNameRegex)) {
         productNameAlert.innerHTML = "Invalid Name";
@@ -177,19 +177,19 @@ function Validation(event) {
     }
     // Validate Quantity
     if (!Qty.match(number)) {
-        qtyAlert.innerHTML = "Quantity must be a positive number.";
+        qtyAlert.innerHTML = "Stock Invalid";
         errors.push("Invalid Quantity");
     }
 
     // Validate Price
     if (!price.match(number)) {
-        priceAlert.innerHTML = "Price must be a positive number.";
+        priceAlert.innerHTML = "Price Invalid.";
         errors.push("Invalid Price");
     }
 
     // Validate Description
     if (!longdescription.match(descriptionRegex)) {
-        longAlert.innerHTML = "Invalid Name";
+        longAlert.innerHTML = "minimum 10 characters";
         errors.push("Invalid Description");
     }
 

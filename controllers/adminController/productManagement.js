@@ -1,5 +1,6 @@
 const Product = require("../../model/productSchema");
 const Category = require("../../model/categorySchema");
+const productOffer = require("../../model/proOfferSchema");
 const fs = require("fs");
 const path = require("path");
 const HttpStatus = require('../../httpStatus');
@@ -12,7 +13,7 @@ const showProduct = async (req, res) => {
     if (req.query.page) {
       page = req.query.page;
     }
-    const limit = 3;
+    const limit = 4;
     const product = await Product.aggregate([
       {
         $lookup: {
@@ -47,8 +48,10 @@ const showProduct = async (req, res) => {
 const addProductPage = async (req, res) => {
   try {
     const category = await Category.find({}).lean();
+    const productExists = req.session.productExists;
+    req.session.productExists = null; 
 
-    res.render("admin/add_product", { layout: "adminLayout", category });
+    res.render("admin/add_product", { layout: "adminLayout", category, productExists });
   } catch (error) {
     console.log(error.message);
     res.status(HttpStatus.InternalServerError).send("Internal Server Error");
@@ -60,12 +63,23 @@ const addProductPage = async (req, res) => {
 // Add New Product
 const addProduct = async (req, res) => {
   try {
+    const { name, price, description, category, stock } = req.body;
     const files = req.files;
     const images = [];
     files.forEach((file) => {
       const image = file.filename;
       images.push(image);
     });
+
+    const existingProduct = await Product.findOne({
+      name: { $regex: new RegExp("^" + name + "$", "i") }, 
+    });
+
+    if (existingProduct) {
+      req.session.productExists = true;
+      return res.redirect("/admin/addProduct"); 
+    }
+
     const newProduct = new Product({
       name: req.body.name,
       price: req.body.price,
@@ -144,6 +158,20 @@ const updateProduct = async (req, res) => {
       },
       { new: true }
     );
+
+    if (product.price !== price) {
+      const existingOffer = await productOffer.findOne({
+        productId: product._id,
+        currentStatus: true, 
+      });
+
+      if (existingOffer) {
+        const newDiscountPrice = price - (price * existingOffer.productOfferPercentage) / 100;
+        existingOffer.discountPrice = newDiscountPrice;
+        await existingOffer.save();
+      }
+    }
+
 
     req.session.productSave = true;
     res.redirect("/admin/product");
