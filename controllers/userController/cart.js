@@ -2,9 +2,7 @@ const Cart = require("../../model/cartSchema");
 const Product = require("../../model/productSchema");
 const mongoose = require("mongoose");
 const HttpStatus = require('../../httpStatus');
-
-
-
+const productOffer = require("../../model/proOfferSchema");
 
 
 
@@ -251,6 +249,14 @@ const updateCart = async (req, res) => {
     const latestPrice = product.price;
     const latestStock = product.stock;
 
+    const existingOffer = await productOffer.findOne({
+      productId: product._id,
+      currentStatus: true,  
+    });
+
+    const finalPrice = existingOffer && existingOffer.discountPrice > 0 
+      ? existingOffer.discountPrice : latestPrice;
+
     //const newValue = req.body.newValue * price;
 
     // Fetch the stock for the product associated with the cart item
@@ -281,7 +287,7 @@ const updateCart = async (req, res) => {
     
 
     // Calculate the new total value for the cart item based on the new quantity
-      const updatedValue = newValue * latestPrice;
+      const updatedValue = newValue * finalPrice;
       console.log(cartIdForUpdate, updatedValue);
 
     const updatedcartvalue = await Cart.updateOne(
@@ -397,7 +403,7 @@ const checkOutOfStock = async (req, res) => {
 
       return res.json({
         success: false,
-        message: `invalid quantity ${quantityMessages.join("; ")}. Please update the quantity.`,
+        message: `${quantityMessages.join("; ")}. Please update the quantity.`,
       });
     }
     

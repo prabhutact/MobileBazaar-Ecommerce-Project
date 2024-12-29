@@ -57,7 +57,7 @@
                                     <label class="form-label">Category:</label>
                                     <select name="category" id="category" class="form-select">
                                         {{#each categories}}
-                                        <option value="{{this._id}}">{{this.category}}</option>
+                                        <option value="{{this._id}}" {{#if this.isSelected}}selected{{/if}}>{{this.category}}</option>
                                         {{/each}}
                                     </select>
                                 </div>
@@ -305,7 +305,9 @@ document.addEventListener("DOMContentLoaded", deleteProImg);
                     title: "Saved",
                     //text: "Your changes have been saved.",
                     icon: "success",
-                    confirmButtonText: "OK"
+                    //confirmButtonText: "OK"
+                    confirmButtonText: "Yes, save it!",
+                    timer: 1500 
                 }).then(() => {
                     form.submit();
                 });

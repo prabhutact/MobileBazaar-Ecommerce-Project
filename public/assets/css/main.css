@@ -4454,6 +4454,11 @@ table .product-thumbnail img {
   padding: 8px 40px;
 }
 
+.button.button-add-to-wishlist {
+  padding: 8px 20px;
+}
+
+
 .product-extra-link2 a {
   background: #fff none repeat scroll 0 0;
   border: 1px solid #e5e5e5;

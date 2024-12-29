@@ -97,9 +97,19 @@
                                                     class="button button-add-to-cart">Add to Cart</button>
                                             </span>
                                             {{/if}}
-                                            {{/if}}
+                                        
                                             {{!-- <a aria-label="Add To Wishlist" class="action-btn hover-up"
                                                 href="shop-wishlist.html"><i class="fi-rs-heart"></i></a>    --}}
+                                            {{#if productExistInWishlist}}
+                                            <span id="wishlist">
+                                                <button id="addwishlist-btn" onclick="window.location.href='/wishlist'" class="button button-add-to-wishlist">Go to Wishlist</button>
+                                            </span>
+                                            {{else}}
+                                            <span id="wishlist">
+                                                <button id="addwishlist-btn" data-product-id="{{product._id}}" class="button button-add-to-wishlist">Add to Wishlist</button>
+                                            </span>
+                                            {{/if}}
+                                            {{/if}}
                                         </div>
                                     <ul class="product-meta font-xs color-grey mt-50">
                                         <li class="mb-5">SKU: <a href="#">FWM15VKT</a></li>
@@ -191,4 +201,43 @@
             })
         })
     })
+
+
+    $(document).ready(function () {
+    const userId = ""; 
+
+    // Add to Wishlist
+    $('#addwishlist-btn').on('click', function (e) {
+        e.preventDefault();
+        
+        const prodId = $(this).data('product-id');
+
+        $.ajax({
+            type: 'POST',
+            url: '/addtowishlist',
+            contentType: 'application/json',
+            data: JSON.stringify({ id: prodId, userId: userId }),
+            success: function (response) {
+                Swal.fire({
+                    title: 'Success!',
+                    text: 'Product added to your Wishlist.',
+                    icon: 'success',
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+                $('#wishlist').html('<button id="wishlist-btn" onclick="window.location.href=\'/wishlist\'" class="button button-add-to-wishlist">Go to Wishlist</button>');
+            },
+            error: function (xhr, status, error) {
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Failed to add product to Wishlist.',
+                    icon: 'error',
+                    confirmButtonText: 'Try Again'
+                });
+                console.error(error);
+            }
+        });
+    });
+});
+
 </script>

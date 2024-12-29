@@ -311,7 +311,7 @@
         errors.push("Please Check Qty Again");
     }
 
-    if (!price.match(number)) {
+    if (!number.test(price)) {
         errors.push("Please Check Price Again");
     }
 
@@ -331,6 +331,7 @@
         longAlert.innerHTML = errors.includes("Please Check about Again") ? "Please Check about Again" : "";
         imgAlert.innerHTML = errors.includes("Please choose an image") ? "Please choose an image" : "";
 
+        
         return false; // Prevent form submission
     }
 

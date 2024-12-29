@@ -4,6 +4,7 @@ const User = require("../../model/userSchema");
 const argon2 = require("argon2");
 const userHelper = require("../../helpers/user.helper");
 const Cart = require("../../model/cartSchema");
+const Wishlist = require('../../model/wishlistSchema')
 const Order = require("../../model/orderSchema");
 const HttpStatus = require('../../httpStatus');
 
@@ -353,6 +354,7 @@ const productDetails = async (req, res) => {
     }
 
     let productExistInCart;
+    let productExistInWishlist
     let outOfStock;
 
     await Product.updateOne(
@@ -379,10 +381,23 @@ const productDetails = async (req, res) => {
       });
 
       console.log(ProductExist);
+
       if (ProductExist.length === 0) {
         productExistInCart = false;
       } else {
         productExistInCart = true;
+      }
+
+      const ProductExist1 = await Wishlist.find({
+        userId: userData._id,
+        product_Id: productID,
+      });
+
+      console.log(ProductExist1);
+      if (ProductExist1.length===0) {
+        productExistInWishlist = false;
+      } else {
+        productExistInWishlist = true;
       }
 
       res.render("user/productDetails", {
@@ -390,6 +405,8 @@ const productDetails = async (req, res) => {
         outOfStock,
         productExistInCart,
         ProductExist,
+        productExistInWishlist,
+        ProductExist1,
         userData,
         
       });
@@ -398,6 +415,7 @@ const productDetails = async (req, res) => {
         product,
         outOfStock,
         productExistInCart: false,
+        productExistInWishlist: false,
       });
     }
   } catch (error) {

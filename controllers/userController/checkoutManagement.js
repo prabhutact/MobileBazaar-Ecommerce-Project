@@ -236,9 +236,29 @@ const placeorder = async (req, res) => {
       {
         $lookup: {
           from: "products",
-          foreignField: "_id",
           localField: "product_Id",
+          foreignField: "_id",          
           as: "productData",
+        },
+      },
+      {
+        $unwind: {
+          path: "$productData",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: "productOffers", 
+          localField: "productData._id",
+          foreignField: "productId",
+          as: "productOffer",
+        },
+      },
+      {
+        $unwind: {
+          path: "$productOffer",
+          preserveNullAndEmptyArrays: true, 
         },
       },
       {
@@ -246,28 +266,47 @@ const placeorder = async (req, res) => {
           product_Id: 1,
           userId: 1,
           quantity: 1,
-          value: 1,
-          name: { $arrayElemAt: ["$productData.name", 0] },
-          price: { $arrayElemAt: ["$productData.price", 0] },
-          productDescription: { $arrayElemAt: ["$productData.description", 0] },
-          image: { $arrayElemAt: ["$productData.imageUrl", 0] },
+          //value: 1,
+          name: "$productData.name",
+          productDescription: "$productData.description",
+          image: "$productData.imageUrl",
+          discountPrice: {
+            $cond: {
+              if: { $gt: [{ $ifNull: ["$productOffer.discountPrice", 0] }, 0] }, 
+              then: "$productOffer.discountPrice",
+              else: "$productData.price", 
+            },
+          },
+          stock: "$productData.stock"
         },
       },
     ]);
 
+    
     console.log("product in cart =======>",productInCart);
 
     let productDet = productInCart.map((item) => {
       return {
         _id: item.product_Id,
         name: item.name,
-        price: item.value,
+        price: item.discountPrice,
         quantity: item.quantity,
         image: item.image[0],
+        stock: item.stock,
       };
     });
 
-    console.log(productDet, "aggregated cart prods");
+    console.log("aggregated cart prods-------->",productDet);
+
+    for (let product of productDet) {
+      if (product.quantity > product.stock) {
+        return res.status(400).json({
+          error: `Insufficient stock for product: ${product.name}. Available stock: ${product.stock}`,
+        });
+      }
+    }
+
+    console.log("stock...........>",'product.stock')
 
     // Apply coupon if present
     let finalTotal = totalamount;
