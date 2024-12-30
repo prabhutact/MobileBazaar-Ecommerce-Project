@@ -97,8 +97,6 @@ const unListCategory = async (req, res) => {
 
     const category = await Category.findById(id);
     let newListed = category.isListed;
-    //true => false
-    const product = await Product.updateMany({category:category._id},{$set:{isBlocked: newListed}}) 
 
     await Category.findByIdAndUpdate(
       id,
