@@ -108,7 +108,7 @@ router.post('/verify_Payment', logedin, isBlocked,verifyPayment)
 // Checkout Page
 
 router.get('/cart/checkout', logedin, isBlocked, loadCheckoutPage)
-router.post('/placeorder', logedin, isBlocked, placeorder)
+router.post('', logedin, isBlocked, placeorder)
 router.get('/orderPlaced', logedin, isBlocked, orderSuccess)
 router.get('/payment_failed', logedin , isBlocked , payment_failed)
 

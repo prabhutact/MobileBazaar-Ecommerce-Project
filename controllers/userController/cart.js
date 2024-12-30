@@ -168,6 +168,8 @@ const loadCartPage = async (req, res) => {
         },
       },
     ]);
+
+    console.log('product in cart______', cartProd)
     
     cartProd = cartProd.map(item => {
       if (item.stock <= 0) {

@@ -3,6 +3,7 @@ const Product = require("../../model/productSchema");
 const User = require("../../model/userSchema");
 const mongoose = require("mongoose");
 const HttpStatus = require('../../httpStatus');
+const { isBlocked } = require("../../middleware/usersAuth");
 
 
 
@@ -12,54 +13,18 @@ const getProduct = async (req, res) => {
   try {
     const userData = req.session.user;
 
-    const catName = await Product.aggregate([
-      {
-        $match: {
-          isBlocked: false,
-        },
-      },
-      {
-        $lookup: {
-          from: "categories",
-          localField: "category",
-          foreignField: "_id",
-          as: "category",
-        },
-      },
-      {
-        $unwind: "$category",
-      },
-    ]);
-
     const newProduct = await Product.find()
       .sort({ createdOn: -1 })
       .limit(3)
       .lean();
 
-    let page = 1;
-    if (req.query.page) {
-      page = parseInt(req.query.page);
-    }
-
-    const limit = 6;
-    const loadCatData = await Category.find().lean();
-    const proData = await Product.find({ isBlocked: false })
-      .skip((page - 1) * limit)
-      .limit(limit)
-      .populate("category", "category")
-      .lean();
-
-    const count = await Product.countDocuments({ isBlocked: false });
-    const totalPages = Math.ceil(count / limit);
-    const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
+ 
+    const loadCatData = await Category.find({isListed: true}).lean();
 
     res.render("user/shop", {
-      proData,
-      pages,
-      currentPage: page,
+ 
+   
       userData,
-      currentFunction: "getProductsPage",
-      catName,
       loadCatData,
       newProduct,
     });
@@ -77,7 +42,7 @@ const getProduct = async (req, res) => {
 const searchAndSort = async (req, res) => {
   const { searchQuery, sortOption, categoryFilter, page, limit } = req.body;
 
-  const matchStage = { $match: {} };
+  const matchStage = { $match: {isBlocked: false} };
   if (searchQuery) {
     matchStage.$match.name = { $regex: searchQuery, $options: "i" };
   }

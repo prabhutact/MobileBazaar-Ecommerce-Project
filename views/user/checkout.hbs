@@ -34,8 +34,14 @@
                                             <td>
                                                 <h5><a href="shop-product-full.html">{{this.productName}}</a></h5> <span class="product-qty">{{this.productPrice}}x {{this.quantity}}</span>
                                             </td>
-                                            <td>₹{{multiply this.productPrice this.quantity }}</td>
+                                            <td>₹{{multiply this.productPrice this.quantity }}
+                                                <input  id= "productStock" value="{{this.productStock}}" hidden/>
+                                                <input  id= "productQuantity" value="{{this.quantity}}" hidden/>
+
+                                            </td>
+                                            
                                         </tr>
+                                        
                                         {{/each}}
                                         <tr>
                                         <th> Coupon <span id="copoun_code">
@@ -370,6 +376,27 @@
     });
 
     const placeOrder = () => {
+        const productStock = parseInt(document.getElementById('productStock').value, 10); 
+        const productQuantity = parseInt(document.getElementById('productQuantity').value, 10); 
+
+    // Check if stock is zero
+    if (productStock == 0) {
+        // Show SweetAlert if out of stock
+        Swal.fire({
+            icon: 'error',
+            title: 'Out of Stock',
+            text: 'Sorry, this product is currently out of stock.',
+        });
+
+        return 
+    }else if(productStock < productQuantity) {
+         Swal.fire({
+            icon: 'error',
+            title: 'Not much available',
+            text: 'Sorry, update quantity',
+        });
+        return
+    }
         const selectedAddress = document.getElementById('selectedAddress').value;
         if (!selectedAddress) {
             Swal.fire('Error', 'Please select a delivery address.', 'error');
@@ -476,7 +503,7 @@
             })
 
             const placeOrderData = await datas.json()        
-
+            console.log('response json_______________', placeOrderData)
             if (placeOrderData) {
             console.log('Received placeOrderData:', placeOrderData);
             if (paymentStatus) {            

@@ -126,7 +126,18 @@ const loadCheckoutPage = async (req, res) => {
     const coupon = await Coupon.find().lean();
 
     // Get the cart data to match product IDs and quantities
-    const cartItems = await Cart.find({ userId: ID }).lean();
+  const cartItems = await Cart.find({ userId: ID }).lean();
+
+    const cartItemtoRender = await Cart.find({ userId: ID })
+  .populate({
+    path: "product_Id", // Populate product details
+    model: "Product",
+  })
+  .lean(); 
+
+  console.log("cartItems_______________________________",cartItems)
+  
+  console.log("cartItems_______________________________",cartItemtoRender)
 
     // If no items in cart, return an empty response for cart details
     if (!cartItems.length) {
@@ -163,6 +174,7 @@ const loadCheckoutPage = async (req, res) => {
         $project: {
           _id: 1,
           name: 1,
+          stock:1,
           price: {
             $cond: {
               if: { $gt: [{ $ifNull: ["$productOffer.discountPrice", 0] }, 0] },
@@ -183,6 +195,7 @@ const loadCheckoutPage = async (req, res) => {
         ...cartItem,
         productName: product?.name || "Unknown Product",
         productPrice: product?.price || 0,
+        productStock: product?.stock,
         productDescription: product?.description || "No description available",
         productImage: product?.imageUrl || "default_image.png",
         value: (product?.price || 0) * cartItem.quantity,
@@ -236,8 +249,8 @@ const placeorder = async (req, res) => {
       {
         $lookup: {
           from: "products",
+          foreignField: "_id",
           localField: "product_Id",
-          foreignField: "_id",          
           as: "productData",
         },
       },
@@ -249,7 +262,7 @@ const placeorder = async (req, res) => {
       },
       {
         $lookup: {
-          from: "productOffers", 
+          from: "productoffers",
           localField: "productData._id",
           foreignField: "productId",
           as: "productOffer",
@@ -258,7 +271,7 @@ const placeorder = async (req, res) => {
       {
         $unwind: {
           path: "$productOffer",
-          preserveNullAndEmptyArrays: true, 
+          preserveNullAndEmptyArrays: true,
         },
       },
       {
@@ -266,22 +279,24 @@ const placeorder = async (req, res) => {
           product_Id: 1,
           userId: 1,
           quantity: 1,
-          //value: 1,
           name: "$productData.name",
           productDescription: "$productData.description",
           image: "$productData.imageUrl",
-          discountPrice: {
+          discountPrice:  {
             $cond: {
               if: { $gt: [{ $ifNull: ["$productOffer.discountPrice", 0] }, 0] }, 
-              then: "$productOffer.discountPrice",
+              then: "$productOffer.discountPrice", 
               else: "$productData.price", 
             },
           },
-          stock: "$productData.stock"
+          stock: "$productData.stock",
         },
-      },
+      }
+      
     ]);
-
+    
+ 
+    
     
     console.log("product in cart =======>",productInCart);
 
@@ -296,12 +311,14 @@ const placeorder = async (req, res) => {
       };
     });
 
+
+
     console.log("aggregated cart prods-------->",productDet);
 
     for (let product of productDet) {
       if (product.quantity > product.stock) {
-        return res.status(400).json({
-          error: `Insufficient stock for product: ${product.name}. Available stock: ${product.stock}`,
+        return res.json({
+          message: `Insufficient stock for product: ${product.name}. Available stock: ${product.stock}`,
         });
       }
     }
