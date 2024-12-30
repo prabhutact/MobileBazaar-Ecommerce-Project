@@ -143,7 +143,7 @@ const my_Orders = async (req, res) => {
     const id = user._id;
     const userData = await User.findById(id).lean();
     // const userDataObject = userData.toObject();
-    var page = 1;
+    let page = 1;
     if (req.query.page) {
       page = req.query.page;
     }
@@ -180,7 +180,7 @@ const my_Orders = async (req, res) => {
         $limit: limit,
       },
     ]);
-    const count = await Order.find({}).countDocuments();
+    const count = await Order.countDocuments({userId: new mongoose.Types.ObjectId(id)});
     const totalPages = Math.ceil(count / limit);
     const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 

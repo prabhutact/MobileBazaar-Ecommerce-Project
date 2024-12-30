@@ -493,7 +493,7 @@
                 console.log('payment status failed   =>        ')
             requestBody.status = "Payment Failed";
             }
-
+                
             const datas = await fetch('/placeorder', {
             method: 'POST',
             headers: {

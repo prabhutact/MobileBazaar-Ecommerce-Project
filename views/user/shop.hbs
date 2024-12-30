@@ -37,21 +37,20 @@
 
                         </div>
                     </div>
-                    <span id="pro_container">
-                        <div class="row product-grid-3" id="productList">
-                            {{#if proData}}
-                          
-                            
-                            {{else}}
-                            <div>
-                                <h2 class="m-5">No product available</h2>
-                            </div>
-                            {{/if}}
+<span id="pro_container">
+    <div class="row product-grid-3" id="productList">
+       
+            
+{{#each iterator}}
+    <div class="col-lg-4 col-md-4 col-12 col-sm-6">
+        <div style="background-color: #e2e8f0; width: 260px; height: 320px; border-radius: 2rem; gap: 8px; margin-bottom: 20px;"></div>
+    </div>
+{{/each}}
 
+        
+    </div>
+</span>
 
-
-                        </div>
-                    </span>
                     <!--pagination-->
 
                     <div class="pagination-area mt-15 mb-sm-5 mb-lg-0">

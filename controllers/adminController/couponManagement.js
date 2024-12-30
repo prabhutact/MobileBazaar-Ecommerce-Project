@@ -15,7 +15,7 @@ const couponPage= async(req,res)=>{
         if(req.query.page){
             page = req.query.page
         }
-        const limit = 1     
+        const limit = 3     
         const couponData = await Coupon.find().skip((page-1)*limit).limit(limit*1).lean()
         const count = await Coupon.find({}).countDocuments();
         const totalPages = Math.ceil(count / limit);

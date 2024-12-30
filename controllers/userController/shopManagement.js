@@ -21,9 +21,11 @@ const getProduct = async (req, res) => {
  
     const loadCatData = await Category.find({isListed: true}).lean();
 
+    const iterator = Array(9).fill(0);
+
     res.render("user/shop", {
  
-   
+      iterator,
       userData,
       loadCatData,
       newProduct,

@@ -125,7 +125,7 @@
         }
 
         if (discount <= 0 || discount > 100) {
-            errors.push('Give discount percentage below 100 and greater than zero');
+            errors.push('Give Valid NUmber above 0 & Below 100');
         }
         if (minpurchase < 0) {
             errors.push('Give a positive price value for minimum purchase');
@@ -136,7 +136,7 @@
 
         if (errors.length > 0) {
             couponerr.innerHTML = errors.includes('Coupon code is not valid') ? 'Coupon code is not valid' : "";
-            discounterr.innerHTML = errors.includes('Give discount percentage below 100 and greater than zero') ? 'Give discount percentage below 100 and greater than zero' : "";
+            discounterr.innerHTML = errors.includes('Give Valid NUmber above 0 & Below 100') ? 'Give Valid NUmber above 0 & Below 100' : "";
             minerror.innerHTML = errors.includes('Give a positive price value for minimum purchase') ? 'Give a positive price value for minimum purchase' : "";
             maxerror.innerHTML = errors.includes('Give a positive price value for maximum discount') ? 'Give a positive price value for maximum discount' : "";
 
