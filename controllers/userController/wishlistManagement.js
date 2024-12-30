@@ -35,29 +35,57 @@ const showWishlistPage = async (req, res) => {
                 $match: { user: new mongoose.Types.ObjectId(userId) }
             },
             {
-                $unwind: '$productId'
-            },
-            {
-                $lookup: {
-                    from: 'products',
-                    foreignField: '_id',
-                    localField: 'productId',
-                    as: 'product'
-                }
-            },
-            {
-                $project: {
-                    _id: 1,
-                    productId: 1,
-                    productName: { $arrayElemAt: ['$product.name', 0] },
-                    productImage: { $arrayElemAt: ['$product.imageUrl', 0] },
-                    productPrice: { $arrayElemAt: ['$product.price', 0] },
-                    productQuantity: { $arrayElemAt: ['$product.stock', 0] },
-                    outOfStock: { $cond: { if: { $lte: [{ $arrayElemAt: ['$product.stock', 0] }, 0] }, then: true, else: false } },
-                    ProductExistInCart: { $in: [{ $toString: '$productId' }, cartProductIds] }
-                }
-            }
-        ]);
+    $unwind: '$productId'
+  },
+  {
+    $lookup: {
+      from: 'products',
+      foreignField: '_id',
+      localField: 'productId',
+      as: 'productData'
+    }
+  },
+  {
+    $unwind: {
+      path: '$productData',
+      preserveNullAndEmptyArrays: true
+    }
+  },
+  {
+    $lookup: {
+      from: 'productoffers',
+      localField: 'productData._id',
+      foreignField: 'productId',
+      as: 'productOffer'
+    }
+  },
+  {
+    $unwind: {
+      path: '$productOffer',
+      preserveNullAndEmptyArrays: true
+    }
+  },
+  {
+    $project: {
+      _id: 1,
+      productId: 1,
+      productName: "$productData.name",
+      productImage: "$productData.imageUrl",
+      productDescription: "$productData.description",
+      productQuantity: "$productData.stock",
+      productPrice: {
+        $cond: {
+          if: { $gt: [{ $ifNull: ["$productOffer.discountPrice", 0] }, 0] },
+          then: "$productOffer.discountPrice",
+          else: "$productData.price"
+        }
+      },
+      outOfStock: {
+        $cond: { if: { $lte: ["$productData.stock", 0] }, then: true, else: false }
+      }
+    }
+  }
+]);
 
         console.log(WishListProd, "WishListProd");
 
