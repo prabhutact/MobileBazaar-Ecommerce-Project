@@ -150,6 +150,7 @@ function Validation(event) {
     // Regular expressions for validation
     const productNameRegex = /^[a-zA-Z0-9\s\(\)\-\+]{4,}$/;
     const number = /^[1-9]\d*$/;
+    const number1 = /^[0-9]\d*$/;
     const descriptionRegex = /^(?!\s*$)[a-zA-Z0-9\s\(\)\-\+]{10,100}$/;
 
 
@@ -176,7 +177,7 @@ function Validation(event) {
         errors.push("Invalid Product Name");
     }
     // Validate Quantity
-    if (!Qty.match(number)) {
+    if (!Qty.match(number1)) {
         qtyAlert.innerHTML = "Stock Invalid";
         errors.push("Invalid Quantity");
     }
